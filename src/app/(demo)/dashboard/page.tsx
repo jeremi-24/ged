@@ -86,11 +86,11 @@ export default function DashboardPage() {
             onCheckedChange={(x) => setSettings({ isHoverOpen: x })}
             checked={settings.isHoverOpen}
           />
-          <Label htmlFor="is-hover-open">Hover Open</Label>
+          <Label htmlFor="is-hover-open">Ouvrir en survol</Label>
         </div>
       </TooltipTrigger>
       <TooltipContent>
-        <p>When hovering on the sidebar in mini state, it will open</p>
+        <p>Lorsque vous survolez la barre latérale en mini état, il s&apos;ouvrira</p>
       </TooltipContent>
     </Tooltip>
     
@@ -103,11 +103,11 @@ export default function DashboardPage() {
             onCheckedChange={(x) => setSettings({ disabled: x })}
             checked={settings.disabled}
           />
-          <Label htmlFor="disable-sidebar">Disable Sidebar</Label>
+          <Label htmlFor="disable-sidebar">Désactiver la barre latérale</Label>
         </div>
       </TooltipTrigger>
       <TooltipContent>
-        <p>Hide sidebar</p>
+        <p>Cacher la barre latterale</p>
       </TooltipContent>
     </Tooltip>
 
