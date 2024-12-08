@@ -46,7 +46,7 @@ export function Sidebar() {
               )}
             >
              <Image
-        src="/DOCUIA1.png" // chemin relatif depuis le dossier public
+        src="/yuno.png" // chemin relatif depuis le dossier public
         alt="Description de l'image"
         width={300} // largeur de l'image
         height={300}

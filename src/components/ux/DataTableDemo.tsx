@@ -253,7 +253,7 @@ export function DataTableDemo({ onRefresh ,onDocumentClick,setSelectedIds }: Dat
 
   return (
     <div className="w-full">
-       <h1 className="text-3xl font-bold text-start  text-blue-600">Gérer vos documents</h1>
+       <h1 className="text-3xl font-bold text-start  text-emerald-600">Gérer vos documents</h1>
       <div className="flex items-center py-2">
         <Input
           placeholder="Recherchez votre document..."

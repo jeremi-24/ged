@@ -202,7 +202,7 @@ if (user) {
               <div className="absolute inset-y-0 right-3 flex items-center cursor-pointer">
               <div className="group relative p-2 rounded-full">
   <div onClick={handleVoiceSearch} className="flex items-center">
-    <Mic  className="hover:text-blue-500 text-gray-400 mr-1" /> {/* Icône Mic */}
+    <Mic  className="hover:text-green-600 text-gray-400 mr-1" /> {/* Icône Mic */}
     {showTooltip && (
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mt-2 p-2 bg-blue-500 text-white text-sm rounded shadow-lg animate-fadeInOut">
           Cliquez ici pour commencer !
@@ -248,7 +248,7 @@ if (user) {
                    )}
                
                    <div className='mb-3 ml-3'>
-                     <h3 className="text-lg font-semibold text-blue-600">{doc.name}</h3>
+                     <h3 className="text-lg font-semibold text-green-600">{doc.name}</h3>
                      <p className="text-gray-600">{doc.classification}</p>
                      <p className={`text-gray-600 ${doc.isArchived ? 'text-green-600' : 'text-red-600'}`}>
                        {doc.isArchived !== undefined 
@@ -265,7 +265,7 @@ if (user) {
                       <Link href={`/discussion?id=${doc.url}&text=${encodeURIComponent(doc.text)}&texte=${encodeURIComponent(doc.url)}`}>
                       <button 
                        
-                        className="absolute bottom-2 right-2 bg-blue-600 text-white rounded-full p-2 shadow-lg hover:bg-blue-700 transition duration-150"
+                        className="absolute bottom-2 right-2 bg-green-600 text-white rounded-full p-2 shadow-lg hover:bg-blue-700 transition duration-150"
                       >
                         <Sparkle className="w-5 h-5" />
                       </button></Link>
@@ -273,7 +273,7 @@ if (user) {
                       {/* Bouton plus bas et plus petit */}
                       <button 
                         onClick={() => downloadFile(doc.url, doc.name)}
-                        className="absolute bottom-12 right-2 bg-blue-600 text-white rounded-full p-2 shadow-lg hover:bg-blue-700 transition duration-150"
+                        className="absolute bottom-12 right-2 bg-green-600 text-white rounded-full p-2 shadow-lg hover:bg-blue-700 transition duration-150"
                       >
                         <Download className="w-5 h-5" />
                       </button>
@@ -298,7 +298,7 @@ if (user) {
   
           {/* Options de filtre */}
           <div className="w-full max-w-2xl space-y-4 mt-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Options de filtre</h2>
+            <h2 className="text-xl font-semibold text-green-600 mb-4">Options de filtre</h2>
   
             {/* Filtre de classification */}
             <div>
