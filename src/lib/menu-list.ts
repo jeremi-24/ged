@@ -65,7 +65,7 @@ export function getMenuList(pathname: string): Group[] {
           icon: Search,
         },
         {
-          href: "/tags",
+          href: "/logs",
           label: "Rapports",
           icon: Flag
         }

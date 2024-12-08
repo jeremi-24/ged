@@ -15,8 +15,10 @@ import { logEvent } from '@/lib/services/logEvent';
 import { getDeviceInfo } from '@/lib/utils/deviceInfo';
 import { getAuth } from 'firebase/auth';
 import UserInfoDialog from '@/components/ux/UserInfoDialog';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Contenu() {
+  const {toast}= useToast();
   const { searchText, setSearchText, results, startVoiceSearch } = useSearch();
   const [debouncedSearchText, setDebouncedSearchText] = useState(searchText);
   const [classificationFilter, setClassificationFilter] = useState<string>('');
@@ -65,7 +67,12 @@ export default function Contenu() {
     };
   
     recognition.onerror = (event: any) => {
-      console.error('Erreur de reconnaissance vocale:', event.error); // Log d'erreur
+    
+      toast({
+        title: "Erreur",
+        description: `Erreur de reconnaissance vocale: ${event.error}`, // Utilisation correcte de la variable event.error
+        variant: "destructive",
+    });// Log d'erreur
     };
   
     recognition.start(); // Démarre la reconnaissance vocale

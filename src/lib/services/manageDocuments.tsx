@@ -22,9 +22,11 @@ export const deleteDocument = async (documentId: string) => {
   try {
     // Supprimer le document dans la sous-collection 'documents' de l'utilisateur
     await deleteDoc(doc(firestore, 'users', userId, 'documents', documentId));
+    
     console.log(`Document avec ID ${documentId} supprimé de l'utilisateur ${userId}.`);
   } catch (error) {
     console.error("Erreur lors de la suppression du document :", error);
+    
   }
 };
 

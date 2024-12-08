@@ -8,6 +8,7 @@ import { Timestamp } from 'firebase/firestore';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Search, Mic, Share2, Trash2, Download, X, Sparkle } from "lucide-react";
 import './style.css';
+import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
 import { DialogTitle } from '@/components/ui/dialog';
 import { LogEntry } from '@/types/Logs';
@@ -22,6 +23,7 @@ export default function AdminContent() {
   const [classificationFilter, setClassificationFilter] = useState<string>('');
   const [dateFilter, setDateFilter] = useState<string>('');
   const [sortOption, setSortOption] = useState<string>('');
+  const { toast } = useToast();
   const [groupOption, setGroupOption] = useState<string>('');
 
   const [showTooltip, setShowTooltip] = useState(true);
@@ -79,8 +81,15 @@ export default function AdminContent() {
     };
   
     recognition.onerror = (event: any) => {
-      console.error('Erreur de reconnaissance vocale:', event.error); // Log d'erreur
-    };
+      console.error('Erreur de reconnaissance vocale:', event.error);
+  
+      toast({
+          title: "Erreur",
+          description: `Erreur de reconnaissance vocale: ${event.error}`, // Utilisation correcte de la variable event.error
+          variant: "destructive",
+      });
+  };
+  
   
     recognition.start(); // Démarre la reconnaissance vocale
   };
@@ -169,7 +178,12 @@ if (user) {
       setDialogDescription(`Le document ${fileName} a été téléchargé avec succès.`);
       setDialogOpen(true);
     } catch (error) {
-      console.error("Erreur lors du téléchargement du fichier :", error);
+     
+      toast({
+        title: "Erreur",
+        description: `Erreur lors du téléchargement du fichier: ${error}`, // Utilisation correcte de la variable event.error
+        variant: "destructive",
+    });
     }
   };
     
