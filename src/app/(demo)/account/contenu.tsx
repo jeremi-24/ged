@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { auth, firestore, storage } from "@/firebase/config";
@@ -32,25 +32,7 @@ const Contenu = () => {
   const [newPassword, setNewPassword] = useState('');  
   const [darkMode, setDarkMode] = useState<boolean>(false);  
 
-  // Effet pour charger les données de l'utilisateur
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        await loadUserData(user.uid);
-      } else {
-        setUser(null);
-      }
-    });
-
-    const storedDarkMode = localStorage.getItem('darkMode');
-    if (storedDarkMode) {
-      setDarkMode(JSON.parse(storedDarkMode));
-    }
-
-    return () => unsubscribe();
-  }, []);
-
-  const loadUserData = async (uid: string) => {
+  const loadUserData = useCallback(async (uid: string) => {
     setLoading(true);
     try {
       const userDoc = await getDoc(doc(firestore, 'users', uid));
@@ -65,21 +47,40 @@ const Contenu = () => {
         description: `Échec de la récupération des données utilisateur : ${(error as Error).message}`,
         variant: "destructive",
         action: (
-          <ToastAction altText="succes icone" className='border-none'>  <Image 
-          src="/cancel.png" 
-          alt="Animation de succès"
-          width={30} // Ajuste la taille en pixels
-          height={30} // Ajuste la taille en pixels
-          style={{
-            border: 'none',
-          }}
-        /></ToastAction>
+          <ToastAction altText="succes icone" className='border-none'>
+            <Image 
+              src="/cancel.png" 
+              alt="Animation de succès"
+              width={30} // Ajuste la taille en pixels
+              height={30} // Ajuste la taille en pixels
+              style={{
+                border: 'none',
+              }}
+            />
+          </ToastAction>
         ),
       });
     }
     setLoading(false);
-  };
-
+  }, [toast]); // Dépendance firestore (si c'est un objet qui peut changer)
+  
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await loadUserData(user.uid); // Appeler la fonction mémorisée
+      } else {
+        setUser(null);
+      }
+    });
+  
+    const storedDarkMode = localStorage.getItem('darkMode');
+    if (storedDarkMode) {
+      setDarkMode(JSON.parse(storedDarkMode));
+    }
+  
+    return () => unsubscribe();
+  }, [loadUserData]); // Ajout de loadUserData comme dépendance
+  
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];

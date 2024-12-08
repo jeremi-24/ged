@@ -49,6 +49,13 @@ export const useSearch = () => {
     }
   };
 
+    // Fonction pour rechercher des documents
+    const filterDocuments = (text: string): DocumentData[] => {
+      const regex = new RegExp(text, 'i'); // 'i' pour une recherche insensible à la casse
+      return allDocuments.filter(doc => doc.text && regex.test(doc.text));
+    };
+    
+
   // Utilise useEffect pour récupérer les documents une seule fois lors du premier chargement
   useEffect(() => {
     fetchAllDocuments();
@@ -62,14 +69,10 @@ export const useSearch = () => {
       const filteredResults = filterDocuments(searchText);
       setResults(filteredResults);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchText, allDocuments]);
 
-  // Fonction pour rechercher des documents
-  const filterDocuments = (text: string): DocumentData[] => {
-    const regex = new RegExp(text, 'i'); // 'i' pour une recherche insensible à la casse
-    return allDocuments.filter(doc => doc.text && regex.test(doc.text));
-  };
-  
+
       
   // Fonction pour enregistrer l'historique des recherches dans Firestore
   const enregistrerHistoriqueRecherche = async (searchText: string) => {

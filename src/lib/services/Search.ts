@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { firestore } from '@/firebase/config';
 import { collection, getDocs, addDoc } from 'firebase/firestore';
 import { DocumentData } from '@/types/types';
@@ -51,6 +51,12 @@ export const useSearch = () => {
     fetchAllDocuments();
   }, []);
 
+  // Fonction pour rechercher des documents
+  const filterDocuments = useCallback((text: string) => {
+    return allDocuments.filter(doc => doc.text.includes(text));
+  }, [allDocuments]); // Dépend de allDocuments
+  
+
   // Utilise useEffect pour filtrer les résultats chaque fois que le texte de recherche change
   useEffect(() => {
     if (!searchText) {
@@ -62,13 +68,9 @@ export const useSearch = () => {
       // Enregistrer la recherche dans Firestore
       enregistrerHistoriqueRecherche(searchText);
     }
-  }, [searchText, allDocuments]);
+  }, [searchText, allDocuments, filterDocuments]);
 
-  // Fonction pour rechercher des documents
-  const filterDocuments = (text: string): DocumentData[] => {
-    const regex = new RegExp(text, 'i'); // 'i' pour une recherche insensible à la casse
-    return allDocuments.filter(doc => doc.text && regex.test(doc.text));
-  };
+  
 
   // Fonction pour enregistrer l'historique des recherches dans Firestore
   const enregistrerHistoriqueRecherche = async (searchText: string) => {

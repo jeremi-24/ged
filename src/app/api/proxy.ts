@@ -1,5 +1,6 @@
 // pages/api/proxy.ts
-export default async function handler(req: { query: { filename?: any; url?: any; }; headers: { authorization: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; }): void; new(): any; }; send: { (arg0: Buffer<ArrayBufferLike>): void; new(): any; }; }; setHeader: (arg0: string, arg1: string | null) => void; }) {
+export default async function handler(req: { query: { filename?: any; url?: any; }; headers: { authorization: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error: string; }): void; new(): any; }; send: { (arg0: Buffer): void; new(): any; };
+}; setHeader: (arg0: string, arg1: string | null) => void; }) {
     // Enregistre la requête pour le débogage
     console.log('Received request:', req.query); 
 

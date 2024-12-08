@@ -50,6 +50,7 @@ const OrcFillForm = ({ imageUrl, onUserFormDataChange }: OrcFillFormProps) => {
     if (imageUrl) {
       processOCR(imageUrl);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imageUrl]);
 
   // Fonction pour gérer les changements dans le formulaire

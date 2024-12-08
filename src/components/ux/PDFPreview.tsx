@@ -27,6 +27,7 @@ const PDFPreview: React.FC<PDFPreviewProps> = ({ pdfUrl }) => {
     };
 
     loadPDF();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pdfUrl]);
 
   const renderPage = async (pageNum: number, pdfDoc: pdfjsLib.PDFDocumentProxy) => {
