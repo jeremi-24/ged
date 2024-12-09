@@ -29,7 +29,39 @@ const classifyDocument = async (text: string, options: ClassifyDocumentOptions):
     // Introduire un délai avant l'envoi de chaque requête (1 seconde)
     await delay(1000); // délai de 1 seconde entre les requêtes
 
-    const instruction = `Pour le texte suivant : "${text}", identifiez le type de document. Référez-vous strictement à ces catégories "Facture", "Reçu", "Contrat", "Bon de commande", "Devis", "Rapport", "Relevé bancaire", "Attestation", "Lettre de motivation", "CV", "Document d'identité", "Acte de naissance", "Certificat médical", "Rapport d'audit", "Procès-verbal", "Document légal", "Polices d'assurance", "Fiche de paie", "Courrier administratif", "Document de propriété", "Plan d'affaires", "Proposition", "Accord de confidentialité", "Document technique", "Spécifications", "Bulletin de salaire", "Dossier médical", "Ordre de mission", "État financier". Pour un contrat, réponds juste sans faire de phrase : "Contrat".`;
+    const instruction = `Pour le texte suivant : "${text}", identifiez strictement le type de document parmi les catégories suivantes : 
+- Facture
+- Reçu
+- Contrat
+- Bon de commande
+- Devis
+- Rapport
+- Relevé bancaire
+- Attestation
+- Lettre de motivation
+- CV
+- Document d'identité
+- Acte de naissance
+- Certificat médical
+- Rapport d'audit
+- Procès-verbal
+- Document légal
+- Polices d'assurance
+- Fiche de paie
+- Courrier administratif
+- Document de propriété
+- Plan d'affaires
+- Proposition
+- Accord de confidentialité
+- Document technique
+- Spécifications
+- Bulletin de salaire
+- Dossier médical
+- Ordre de mission
+- État financier.
+
+Répondez uniquement par le type de document, sans faire de phrase. Par exemple, pour un contrat, répondez uniquement : "Contrat".
+`;
 
     // Envoi du message de classification
     const result = await chatSession.sendMessage(instruction);
