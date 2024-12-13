@@ -41,23 +41,51 @@ export default function HomePage() {
               </Link>
             </Button>
             <Button variant="outline" size="lg" className="text-black">
-              <Link href="https://ui.shadcn.com/" target="_blank" rel="noopener noreferrer">
+              <Link href="/connexion" target="_blank" rel="noopener noreferrer">
                 Se Connecter
               </Link>
             </Button>
           </div>
         </div>
 
-        {/* Frame Section */}
-        <section className="w-full max-w-5xl mx-auto rounded-lg p-6 text-gray-800">
-          <h2 className="text-3xl font-bold mb-4 text-center text-white">Démonstration</h2>
-          <div className="aspect-w-16 aspect-h-9 rounded-md overflow-hidden">
-            <video
-              src="" // Remplace par l'URL de ta démonstration
-              title="Démonstration de YunoDoc"
-              className="w-full h-full border-0"
-              controls
-            ></video>
+        {/* Section avec séparation oblique */}
+        <section className="relative w-full max-w-7xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+          {/* Ligne oblique (pseudo-élément avec ::before) */}
+          <div className="relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 items-stretch">
+              {/* Recherche et filtrage */}
+              <div className="p-8 md:p-12 flex flex-col justify-center bg-gradient-to-r from-gray-100 to-gray-200">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Recherche et filtrage</h2>
+                <p className="text-gray-700 mb-6">
+                  Retrouvez rapidement vos documents grâce à nos fonctionnalités de recherche avancées et de classification intelligente.
+                </p>
+                <Button
+                  variant="default"
+                  className="bg-orange-500 text-white px-6 py-2 rounded-lg shadow hover:bg-orange-600 transition"
+                >
+                  En savoir plus
+                </Button>
+              </div>
+
+              {/* Collaboration sécurisée */}
+              <div className="p-8 md:p-12 flex flex-col justify-center bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+                <h2 className="text-3xl font-bold mb-4">Téléversement automatisé</h2>
+                <p className="text-gray-300 mb-6">
+                 Reduction des actions de classification
+                </p>
+                <Button
+                  variant="default"
+                  className="bg-orange-500 text-white px-6 py-2 rounded-lg shadow hover:bg-orange-600 transition"
+                >
+                  En savoir plus
+                </Button>
+              </div>
+            </div>
+
+            {/* Ligne oblique */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute left-0 top-0 w-full h-full transform origin-center -rotate-2 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"></div>
+            </div>
           </div>
         </section>
       </main>
@@ -69,8 +97,8 @@ export default function HomePage() {
             YunoDoc est une solution de gestion documentaire intelligente. Découvrez plus sur notre site et rejoignez-nous !
           </p>
           <p className="mt-2 text-sm">
-            Ekoue Jeremie - <a href="mailto:email@example.com" className="text-yellow-400 underline">jeremiekoue8@gmail.com</a> - <span>Tél : +228 79797940</span>
-            - <span>LinkedIn : <a href="mailto:https://www.linkedin.com/in/jeremie-ekoue-a95873308" className="text-yellow-400 underline">https://www.linkedin.com/in/jeremie-ekoue-a95873308</a></span>
+            Ekoue Jeremie - <a href="mailto:jeremiekoue8@gmail.com" className="text-yellow-400 underline">jeremiekoue8@gmail.com</a> - <span>Tél : +228 79797940</span>
+            - <span>LinkedIn : <a href="https://www.linkedin.com/in/jeremie-ekoue-a95873308" className="text-yellow-400 underline">https://www.linkedin.com/in/jeremie-ekoue-a95873308</a></span>
           </p>
         </div>
       </footer>

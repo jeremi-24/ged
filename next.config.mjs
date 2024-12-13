@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['firebasestorage.googleapis.com'], // Ajouter le domaine ici
+    domains: ['firebasestorage.googleapis.com'], 
   },
   experimental: {
-    cache: true, // Active le cache de build
+  
   },
 };
 

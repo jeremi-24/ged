@@ -10,7 +10,7 @@ export const useSearch = () => {
   const [results, setResults] = useState<DocumentData[]>([]);
   const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
 
-  // Fonction pour récupérer tous les documents lors du premier chargement
+  // Fonction pour récupérer tous les documents avec cache
   const fetchAllDocuments = async () => {
     try {
       const auth = getAuth();
@@ -19,6 +19,14 @@ export const useSearch = () => {
       if (!user) {
         console.error("Aucun utilisateur connecté.");
         return; // Sortir de la fonction si l'utilisateur n'est pas connecté
+      }
+
+      // Vérifier si les documents sont dans le cache local
+      const cachedDocuments = localStorage.getItem(`documents_${user.uid}`);
+      if (cachedDocuments) {
+        console.log("Documents récupérés depuis le cache local.");
+        setAllDocuments(JSON.parse(cachedDocuments)); // Utiliser le cache
+        return;
       }
 
       const documentsRef = collection(firestore, 'users', user.uid, 'documents'); // Accéder à la sous-collection "documents"
@@ -40,7 +48,8 @@ export const useSearch = () => {
       });
 
       setAllDocuments(documents); // Stocke tous les documents dans l'état
-      console.log("Tous les documents récupérés :", documents);
+      localStorage.setItem(`documents_${user.uid}`, JSON.stringify(documents)); // Mettre en cache dans le localStorage
+      console.log("Tous les documents récupérés et mis en cache :", documents);
     } catch (error) {
       console.error("Erreur lors de la récupération des documents :", error);
     }
@@ -55,7 +64,6 @@ export const useSearch = () => {
   const filterDocuments = useCallback((text: string) => {
     return allDocuments.filter(doc => doc.text.includes(text));
   }, [allDocuments]); // Dépend de allDocuments
-  
 
   // Utilise useEffect pour filtrer les résultats chaque fois que le texte de recherche change
   useEffect(() => {
@@ -69,8 +77,6 @@ export const useSearch = () => {
       enregistrerHistoriqueRecherche(searchText);
     }
   }, [searchText, allDocuments, filterDocuments]);
-
-  
 
   // Fonction pour enregistrer l'historique des recherches dans Firestore
   const enregistrerHistoriqueRecherche = async (searchText: string) => {
