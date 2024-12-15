@@ -43,7 +43,8 @@ export default function Contenu() {
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogDescription, setDialogDescription] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
-  
+  const [showVideoPopup, setShowVideoPopup] = useState(false);
+
   // Étape 2: État pour stocker les données des documents
   const [documentDataList, setDocumentDataList] = useState<DocumentData[]>([]);
   const [loadingFinished, setLoadingFinished] = useState(false); // État pour savoir si le chargement est terminé
@@ -250,7 +251,11 @@ onAuthStateChanged(auth, async (user) => {
     </DialogHeader>
     <div className="flex justify-center">
       <video controls className="w-full max-w-[500px]">
+<<<<<<< HEAD
         <source src="https://cdn.pixabay.com/video/2016/05/01/2946-164933125_large.mp4" type="video/mp4" />
+=======
+        <source src="/path/to/your/video.mp4" type="video/mp4" />
+>>>>>>> 5f59ccb6db55d7dcd8f9a97e8ee48df8793bcfef
         Votre navigateur ne prend pas en charge la lecture vidéo.
       </video>
     </div>
@@ -264,7 +269,10 @@ onAuthStateChanged(auth, async (user) => {
   </DialogContent>
 </Dialog>
 
+<<<<<<< HEAD
       
+=======
+>>>>>>> 5f59ccb6db55d7dcd8f9a97e8ee48df8793bcfef
       </div>
           <div className="flex flex-col relative">
             <FileUpload onDrop={handleDrop} />
