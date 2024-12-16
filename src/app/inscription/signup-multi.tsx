@@ -3,8 +3,8 @@ import { useForm, Controller } from "react-hook-form";
 
 
 import { ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-
-
+import { auth, firestore } from '@/firebase/config';
+import { collection, addDoc, setDoc, doc, getDocs } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import { storage } from "@/firebase/config";
@@ -67,6 +67,24 @@ export function MultiStepForm({
       const responseData = await response.json();
   
       if (response.ok) {
+        const user = auth.currentUser; // Obtenez l'utilisateur actuellement authentifié
+
+        if (user) {
+          // Vérifier si l'utilisateur est le premier utilisateur
+          
+  
+          // Création du document utilisateur dans Firestore
+          const userDoc = {
+            email: email,
+            createdAt: new Date(),
+            first_name: data.first_name || '',
+            last_name: data.last_name || '',
+            role:data.role ,
+          };
+  
+          // Ajoutez le document à la collection 'users' dans Firestore
+          await setDoc(doc(firestore, "users", user.uid), userDoc);
+        }
         console.log("Utilisateur créé avec succès:", responseData.user);
         router.push('/connexion');
       } else {
