@@ -43,12 +43,10 @@ export default function Contenu() {
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogDescription, setDialogDescription] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
-  const [showVideoPopup, setShowVideoPopup] = useState(false);
-
+  
   // Étape 2: État pour stocker les données des documents
   const [documentDataList, setDocumentDataList] = useState<DocumentData[]>([]);
   const [loadingFinished, setLoadingFinished] = useState(false); // État pour savoir si le chargement est terminé
-  const [showVideoPopup, setShowVideoPopup] = useState(false);
 
   const handleDrop = async (files: File[]) => {
     setUploading(true);
@@ -56,7 +54,6 @@ export default function Contenu() {
     setDialogOpen(false);
     setLoadingFinished(false);
     setDocumentDataList([]);
-    setShowVideoPopup(true);
   
     try {
       for (const file of files) {
@@ -78,7 +75,6 @@ export default function Contenu() {
       setDialogOpen(true);
     } finally {
       setUploading(false);
-      setShowVideoPopup(false);
     }
   };
   
@@ -241,38 +237,7 @@ onAuthStateChanged(auth, async (user) => {
       <div className="p-6"> <UserInfoDialog/>  <FileSelector onDrop={handleDrop} />
         <div className="flex justify-center items-center min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">
         <div className="flex-shrink-0 p-4">
-        <Dialog open={showVideoPopup} onOpenChange={(open) => setShowVideoPopup(open)}>
-  <DialogContent className="w-full max-w-3xl">
-    <DialogHeader>
-      <DialogTitle>Vidéo de Progression</DialogTitle>
-      <DialogDescription>
-        <p>Voici la vidéo pendant le téléchargement du fichier.</p>
-      </DialogDescription>
-    </DialogHeader>
-    <div className="flex justify-center">
-      <video controls className="w-full max-w-[500px]">
-<<<<<<< HEAD
-        <source src="https://cdn.pixabay.com/video/2016/05/01/2946-164933125_large.mp4" type="video/mp4" />
-=======
-        <source src="/path/to/your/video.mp4" type="video/mp4" />
->>>>>>> 5f59ccb6db55d7dcd8f9a97e8ee48df8793bcfef
-        Votre navigateur ne prend pas en charge la lecture vidéo.
-      </video>
-    </div>
-    <DialogFooter>
-      <DialogClose>
-        <button className="p-2 bg-red-500 text-white rounded">
-          Fermer
-        </button>
-      </DialogClose>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
-
-<<<<<<< HEAD
       
-=======
->>>>>>> 5f59ccb6db55d7dcd8f9a97e8ee48df8793bcfef
       </div>
           <div className="flex flex-col relative">
             <FileUpload onDrop={handleDrop} />
