@@ -77,8 +77,8 @@ export function MultiStepForm({
           const userDoc = {
             email: email,
             createdAt: new Date(),
-            first_name: data.first_name || '',
-            last_name: data.last_name || '',
+            nom: data.first_name || '',
+            prenom: data.last_name || '',
             role:data.role ,
           };
   
