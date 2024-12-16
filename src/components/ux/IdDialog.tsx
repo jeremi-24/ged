@@ -20,7 +20,7 @@ const IdDialog = ({ isOpen, onClose, onStartSteps }: IdDialogProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null); // Fichier téléchargé
   const [imageUrl, setImageUrl] = useState<string>(''); // URL de l'image téléchargée
-  const [userFormData, setUserFormData] = useState({ numero: '', nom: '', prenom: '' }); // Données utilisateur
+  const [userFormData, setUserFormData] = useState({ numero: '' }); // Données utilisateur
   const [isSubmitting, setIsSubmitting] = useState(false); // État de soumission
   const [error, setError] = useState<string | null>(null); // Erreur possible
   const [user, setUser] = useState<any>(null); // Utilisateur connecté
@@ -67,8 +67,6 @@ const IdDialog = ({ isOpen, onClose, onStartSteps }: IdDialogProps) => {
         const userDocRef = doc(firestore, 'users', user.uid);
         await setDoc(userDocRef, {
           numero: userFormData.numero,
-          nom: userFormData.nom,
-          prenom: userFormData.prenom,
           createdAt: new Date(),
         }, { merge: true });
 

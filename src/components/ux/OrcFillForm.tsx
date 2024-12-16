@@ -5,29 +5,20 @@ import Tesseract from 'tesseract.js';
 const extractInformation = (text: string) => {
   const cleanedText = text.replace(/[\n\r\t—™®~:]/g, ' ').replace(/\s{2,}/g, ' ').trim();
   const numeroMatch = cleanedText.match(/Numéro\s*[:\-]?\s*(\d{4}-\d{3}-\d{4}|\d{11})/i);
-  const nomMatch = cleanedText.match(/Nom\s*[:\-]?\s*(\S.*?)(?=\s+Prénom|$)/i);
-  const prenomMatch = cleanedText.match(/Prénom\s*[:\-]?\s*(\S.*?)(?=\s+Nel|$)/i);
-
-  const cleanedNom = nomMatch ? nomMatch[1].split(' ')[0] : '';
-  const cleanedPrenom = prenomMatch ? prenomMatch[1].split(' ')[0] : '';
 
   return {
-    numero: numeroMatch ? numeroMatch[1] : '',
-    nom: cleanedNom,
-    prenom: cleanedPrenom
+    numero: numeroMatch ? numeroMatch[1] : ''
   };
 };
 
 type OrcFillFormProps = {
   imageUrl: string; // L'URL de l'image pour l'OCR
-  onUserFormDataChange: (data: { numero: string; nom: string; prenom: string }) => void; // Fonction de mise à jour des données
+  onUserFormDataChange: (data: { numero: string }) => void; // Fonction de mise à jour des données
 };
 
 const OrcFillForm = ({ imageUrl, onUserFormDataChange }: OrcFillFormProps) => {
   const [userFormData, setUserFormData] = useState({
-    numero: '',
-    nom: '',
-    prenom: ''
+    numero: ''
   });
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
@@ -83,32 +74,6 @@ const OrcFillForm = ({ imageUrl, onUserFormDataChange }: OrcFillFormProps) => {
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="Numéro"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="nom" className="block text-sm font-medium text-gray-700">Nom</label>
-            <input
-              id="nom"
-              name="nom"
-              type="text"
-              value={userFormData.nom}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="Nom"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="prenom" className="block text-sm font-medium text-gray-700">Prénom</label>
-            <input
-              id="prenom"
-              name="prenom"
-              type="text"
-              value={userFormData.prenom}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="Prénom"
             />
           </div>
         </form>

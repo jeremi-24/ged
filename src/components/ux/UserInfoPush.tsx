@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 type UserInfoPushProps = {
-  userFormData: { numero: string; nom: string; prenom: string }; // Données à afficher
+  userFormData: { numero: string;  }; // Données à afficher
 };
 
 const UserInfoPush = ({ userFormData }: UserInfoPushProps) => {
@@ -39,14 +39,7 @@ const UserInfoPush = ({ userFormData }: UserInfoPushProps) => {
           <label className="font-medium text-gray-700">Numéro :</label>
           <p className="text-blue-600 font-medium">{userFormData.numero}</p>
         </div>
-        <div className="flex justify-between items-center">
-          <label className="font-medium text-gray-700">Nom :</label>
-          <p className="text-blue-600 font-medium">{userFormData.nom}</p>
-        </div>
-        <div className="flex justify-between items-center">
-          <label className="font-medium text-gray-700">Prénom :</label>
-          <p className="text-blue-600 font-medium">{userFormData.prenom}</p>
-        </div>
+        
       </div>
 
       {/* Affichage des erreurs */}

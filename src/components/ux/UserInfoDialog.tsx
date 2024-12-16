@@ -37,14 +37,14 @@ const UserInfoDialog = () => {
         setUserData(userData);
 
         // Verifying missing fields
-        const isNameMissing = !userData?.nom;
+       
         const isNumberIdMissing = !userData?.numero;
 
-        setIsNameMissing(isNameMissing);
+       
         setIsNumberIdMissing(isNumberIdMissing);
 
         // Open dialog only if either field is missing
-        if (isNameMissing || isNumberIdMissing) {
+        if ( isNumberIdMissing) {
           setDialogOpen(true); // Open the dialog if user info is incomplete
         }
 

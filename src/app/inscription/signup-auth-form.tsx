@@ -9,12 +9,12 @@ import * as z from 'zod';
 
 import React from 'react';
 
-import { MultiStepForm } from './signup-multi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { registerWithEmail } from '@/firebase/auth';
 import { Icons } from '@/components/icons copy';
 import { toast } from '@/hooks/use-toast';
+import { MultiStepForm } from './signup-multi';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
