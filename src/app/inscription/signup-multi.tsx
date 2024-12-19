@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 
 import { ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { auth, firestore } from '@/firebase/config';
-import { collection, addDoc, setDoc, doc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, setDoc, doc, getDocs,updateDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import { storage } from "@/firebase/config";
@@ -111,32 +111,44 @@ export function MultiStepForm({
     }
   };
 
-  const handleFileUpload = async (file: File) => {
-    const storageRef = ref(storage, `profile_pictures/${file.name}`); // Référence pour le fichier
-    const uploadTask = uploadBytesResumable(storageRef, file); // Crée une tâche d'upload
+ 
 
-    return new Promise<string>((resolve, reject) => {
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          // Optionnel : Vous pouvez ajouter une gestion du progrès ici
-        },
-        (error) => {
-          reject(error); // Si une erreur se produit, on la rejette
-        },
-        () => {
-          // Lorsque l'upload est terminé, on récupère l'URL du fichier
-          getDownloadURL(uploadTask.snapshot.ref)
-            .then((url) => {
-              resolve(url); // Retourne l'URL du fichier téléchargé
-            })
-            .catch((error) => {
-              reject(error); // En cas d'erreur pour récupérer l'URL
-            });
+const handleFileUpload = async (file: File) => {
+  const storageRef = ref(storage, `profile_pictures/${file.name}`); // Référence pour le fichier
+  const uploadTask = uploadBytesResumable(storageRef, file); // Crée une tâche d'upload
+
+  return new Promise<string>((resolve, reject) => {
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        // Optionnel : Vous pouvez gérer la progression ici
+      },
+      (error) => {
+        reject(error); // Rejette en cas d'erreur
+      },
+      async () => {
+        try {
+          // Lorsque l'upload est terminé, récupère l'URL
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+
+          // Enregistre l'URL dans Firestore sous le document utilisateur
+          const userId = auth.currentUser?.uid; // Assurez-vous qu'un utilisateur est connecté
+          if (!userId) {
+            throw new Error("Utilisateur non authentifié.");
+          }
+
+          const userDocRef = doc(firestore, "users", userId);
+          await updateDoc(userDocRef, { profilePicture: url }); // Enregistre l'URL dans Firestore
+
+          resolve(url); // Retourne l'URL du fichier téléchargé
+        } catch (error) {
+          reject(error); // Rejette en cas d'erreur
         }
-      );
-    });
-  };
+      }
+    );
+  });
+};
+
 
   return (
     <div className={cn("grid gap-6 px-4 py-6", className)}>
