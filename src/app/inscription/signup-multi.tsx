@@ -131,7 +131,7 @@ const handleFileUpload = async (file: File) => {
           // Lorsque l'upload est terminé, récupère l'URL
           const url = await getDownloadURL(uploadTask.snapshot.ref);
 
-          await updateDoc(doc(firestore, 'users', auth.currentUser.uid), { photoURL: avatarURL });
+          await updateDoc(doc(firestore, 'users', auth.currentUser.uid), { photoURL: url });
 
           resolve(url); // Retourne l'URL du fichier téléchargé
         } catch (error) {
