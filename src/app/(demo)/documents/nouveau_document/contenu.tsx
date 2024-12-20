@@ -53,7 +53,7 @@ export default function Contenu() {
   const handleDrop = async (files: File[]) => {
     setUploading(true);
     setProgress(0);
-    setShowVideoPopup(true);
+    
     setDialogOpen(false);
     setLoadingFinished(false);
     setDocumentDataList([]);
@@ -79,7 +79,7 @@ export default function Contenu() {
       setDialogOpen(true);
     } finally {
       setUploading(false);
-      setShowVideoPopup(false);
+     
     }
   };
   
