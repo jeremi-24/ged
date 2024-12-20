@@ -43,6 +43,8 @@ export default function Contenu() {
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogDescription, setDialogDescription] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
+  const [showVideoPopup, setShowVideoPopup] = useState(false);
+
   
   // Étape 2: État pour stocker les données des documents
   const [documentDataList, setDocumentDataList] = useState<DocumentData[]>([]);
@@ -51,9 +53,11 @@ export default function Contenu() {
   const handleDrop = async (files: File[]) => {
     setUploading(true);
     setProgress(0);
+    setShowVideoPopup(true);
     setDialogOpen(false);
     setLoadingFinished(false);
     setDocumentDataList([]);
+    
   
     try {
       for (const file of files) {
@@ -75,6 +79,7 @@ export default function Contenu() {
       setDialogOpen(true);
     } finally {
       setUploading(false);
+      setShowVideoPopup(false);
     }
   };
   
@@ -244,6 +249,30 @@ onAuthStateChanged(auth, async (user) => {
             {uploading && (
               <div className="mt-4 flex flex-col items-center">
               <div className="flex items-center w-full">
+                <Dialog open={showVideoPopup} onOpenChange={(open) => setShowVideoPopup(open)}>
+  <DialogContent className="w-full max-w-3xl">
+    <DialogHeader>
+      <DialogTitle>Vidéo de Progression</DialogTitle>
+      <DialogDescription>
+        <p>Voici la vidéo pendant le téléchargement du fichier.</p>
+      </DialogDescription>
+    </DialogHeader>
+    <div className="flex justify-center">
+      <video controls className="w-full max-w-[500px]">
+        <source src="/path/to/your/video.mp4" type="video/mp4" />
+        Votre navigateur ne prend pas en charge la lecture vidéo.
+      </video>
+    </div>
+    <DialogFooter>
+      <DialogClose>
+        <button className="p-2 bg-red-500 text-white rounded">
+          Fermer
+        </button>
+      </DialogClose>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
                 <Progress value={progress} className="flex-grow " /> {/* Barre de progression */}
                 <Sparkles className="pulse  ml-2 w-8 h-8 "/> {/* Animation à la fin de la barre de progression */}
               </div>
