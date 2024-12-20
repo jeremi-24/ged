@@ -259,7 +259,7 @@ onAuthStateChanged(auth, async (user) => {
     </DialogHeader>
     <div className="flex justify-center">
       <video controls className="w-full max-w-[500px]">
-        <source src="/path/to/your/video.mp4" type="video/mp4" />
+        <source src="https://youtu.be/Qg43xcshtmA" type="video/mp4" />
         Votre navigateur ne prend pas en charge la lecture vidéo.
       </video>
     </div>
