@@ -114,39 +114,31 @@ export function MultiStepForm({
  
 
 const handleFileUpload = async (file: File) => {
-  const storageRef = ref(storage, `profile_pictures/${file.name}`); // Référence pour le fichier
-  const uploadTask = uploadBytesResumable(storageRef, file); // Crée une tâche d'upload
+    const storageRef = ref(storage, `profile_pictures/${file.name}`); // Référence pour le fichier
+    const uploadTask = uploadBytesResumable(storageRef, file); // Crée une tâche d'upload
 
-  return new Promise<string>((resolve, reject) => {
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        // Optionnel : Vous pouvez gérer la progression ici
-      },
-      (error) => {
-        reject(error); // Rejette en cas d'erreur
-      },
-      async () => {
-        try {
-          // Lorsque l'upload est terminé, récupère l'URL
-          const url = await getDownloadURL(uploadTask.snapshot.ref);
-
-          if (auth.currentUser) {
-  await updateDoc(doc(firestore, 'users', auth.currentUser.uid), { photoURL: url });
-} else {
-  console.error("User not authenticated");
-  // Gérer l'erreur ici si nécessaire
-}
-
-          resolve(url); // Retourne l'URL du fichier téléchargé
-        } catch (error) {
-          reject(error); // Rejette en cas d'erreur
+    return new Promise<string>((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Optionnel : Vous pouvez ajouter une gestion du progrès ici
+        },
+        (error) => {
+          reject(error); // Si une erreur se produit, on la rejette
+        },
+        () => {
+          // Lorsque l'upload est terminé, on récupère l'URL du fichier
+          getDownloadURL(uploadTask.snapshot.ref)
+            .then((url) => {
+              resolve(url); // Retourne l'URL du fichier téléchargé
+            })
+            .catch((error) => {
+              reject(error); // En cas d'erreur pour récupérer l'URL
+            });
         }
-      }
-    );
-  });
-};
-
+      );
+    });
+  };
 
   return (
     <div className={cn("grid gap-6 px-4 py-6", className)}>
