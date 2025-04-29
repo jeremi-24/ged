@@ -33,6 +33,10 @@ const LoginPage: React.FC = () => {
   const { user } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+    email: 'demo@example.com', // valeur par défaut
+    password: 'password123',   
+  },
   });
 
   const [error, setError] = useState<string>('');
