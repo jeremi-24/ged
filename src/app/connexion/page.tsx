@@ -33,10 +33,7 @@ const LoginPage: React.FC = () => {
   const { user } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-    email: 'demo@example.com', // valeur par défaut
-    password: 'password1',   
-  },
+    
   });
 
   const [error, setError] = useState<string>('');
@@ -187,6 +184,7 @@ const LoginPage: React.FC = () => {
                     type="email"
                     placeholder="Email"
                     {...register('email')}
+                    defaultValue="jeremiekoue8@gmail.com"
                     required
                     className="bg-transparent text-black border border-gray-300 focus:ring-2 focus:ring-blue-500"
                   />
@@ -195,6 +193,7 @@ const LoginPage: React.FC = () => {
                     type="password"
                     placeholder="Mot de passe"
                     {...register('password')}
+                    defaultValue="jeremiekoue"
                     required
                     className="bg-transparent text-black border border-gray-300 focus:ring-2 focus:ring-blue-500"
                   />
