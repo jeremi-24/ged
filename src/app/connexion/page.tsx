@@ -35,7 +35,7 @@ const LoginPage: React.FC = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
     email: 'demo@example.com', // valeur par défaut
-    password: 'password123',   
+    password: 'password1',   
   },
   });
 
