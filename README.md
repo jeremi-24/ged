@@ -1,3 +1,5 @@
+
+![screenshot](./public/yuno1.jpg)
 # YunoDoc - Electronic Document Management Application (EDMS)
 
 **YunoDoc** is a modern Electronic Document Management System (EDMS) designed to automate document uploading, classification, search, and tracking for organizations. Built with **Next.js**, **Drizzle ORM**, **Neon (PostgreSQL)**, **Firebase**, and **Tailwind CSS**, it offers a fast and efficient user experience for managing business documents.
