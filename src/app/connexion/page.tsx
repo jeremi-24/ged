@@ -33,7 +33,10 @@ const LoginPage: React.FC = () => {
   const { user } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    
+    defaultValues: { // Set default values here
+      email: "jeremiekoue8@gmail.com",
+      password: "jeremiekoue",
+    },
   });
 
   const [error, setError] = useState<string>('');
@@ -160,19 +163,19 @@ const LoginPage: React.FC = () => {
   
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-purple-500">
-      <div className="flex w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="flex w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden flex-col md:flex-row"> {/* Added flex-col and md:flex-row for responsiveness */}
         {/* Animation 3D à gauche */}
-        <div className="w-1/2 flex items-center justify-center bg-cover bg-center">
+        <div className="w-full md:w-1/2 flex items-center justify-center bg-cover bg-center p-4"> {/* Added p-4 for padding on smaller screens */}
           <iframe
             src="https://lottie.host/embed/380be387-a6b5-49db-a2e4-7e7723bf74a1/8XEMIarsRk.json"
-            className="w-full h-full"
+            className="w-full h-64 md:h-full" // Adjusted height for responsiveness
             style={{ border: 'none' }}
             title="Animation GED IA"
           ></iframe>
         </div>
 
         {/* Formulaire à droite */}
-        <div className="w-1/2 p-8">
+        <div className="w-full md:w-1/2 p-8"> {/* Changed w-1/2 to w-full and md:w-1/2 for responsiveness */}
           <Card className='bg-transparent border-none shadow-none  '>
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-center text-black">Connexion</CardTitle>
@@ -184,7 +187,7 @@ const LoginPage: React.FC = () => {
                     type="email"
                     placeholder="Email"
                     {...register('email')}
-                    defaultValue="jeremiekoue8@gmail.com"
+                    
                     required
                     className="bg-transparent text-black border border-gray-300 focus:ring-2 focus:ring-blue-500"
                   />
@@ -193,7 +196,7 @@ const LoginPage: React.FC = () => {
                     type="password"
                     placeholder="Mot de passe"
                     {...register('password')}
-                    defaultValue="jeremiekoue"
+                    
                     required
                     className="bg-transparent text-black border border-gray-300 focus:ring-2 focus:ring-blue-500"
                   />
