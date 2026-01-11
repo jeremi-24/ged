@@ -8,93 +8,72 @@ type ClassifyDocumentOptions = {
 // Fonction pour créer un délai en millisecondes
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-const classifyDocument = async (text: string, options: ClassifyDocumentOptions): Promise<string> => {
+const classifyDocument = async (text: string, options: ClassifyDocumentOptions, imageData?: string): Promise<{ classification: string, full_text: string, metadata: any }> => {
   if (!options.apiKey || options.apiKey === 'your_gemini_api_key') {
-    console.error('Erreur : Clé API Gemini manquante ou non configurée dans le fichier .env.');
     throw new Error('La clé API Gemini est manquante. Veuillez configurer NEXT_PUBLIC_GEMINI_API_KEY dans votre fichier .env.');
   }
 
   const genAI = new GoogleGenerativeAI(options.apiKey);
-  const model = genAI.getGenerativeModel({ model: options.model });
-
-  const generationConfig = {
-    temperature: 0.3, // Réduire la température pour des réponses plus directes
-    topP: 0.95,
-    topK: 40,
-    maxOutputTokens: 8192, // Limitez le nombre de tokens pour obtenir une réponse concise
-    responseMimeType: "text/plain",
-  };
-
-  const chatSession = model.startChat({
-    generationConfig,
-    history: [],
+  const model = genAI.getGenerativeModel({
+    model: options.model,
+    generationConfig: {
+      temperature: 0.1,
+      topP: 0.95,
+      topK: 40,
+      maxOutputTokens: 8192,
+      responseMimeType: "application/json",
+    }
   });
 
   try {
-    // Introduire un délai avant l'envoi de chaque requête (1 seconde)
-    await delay(1000); // délai de 1 seconde entre les requêtes
+    await delay(1000);
 
-    const instruction = `Pour le texte suivant : "${text}", identifiez strictement le type de document parmi les catégories suivantes : 
-- Facture
-- Reçu
-- Contrat
-- Bon de commande
-- Devis
-- Rapport
-- Relevé bancaire
-- Attestation
-- Lettre de motivation
-- CV
-- Document d'identité
-- Acte de naissance
-- Certificat médical
-- Rapport d'audit
-- Procès-verbal
-- Document légal
-- Polices d'assurance
-- Fiche de paie
-- Courrier administratif
-- Document de propriété
-- Plan d'affaires
-- Proposition
-- Accord de confidentialité
-- Document technique
-- Spécifications
-- Bulletin de salaire
-- Dossier médical
-- Ordre de mission
-- État financier.
+    const prompt = `Analysez ce document. Si c'est une image ou un PDF, identifiez le contenu visuel. 
+Extraire le texte complet avec une précision maximale (OCR de haute qualité).
+Classez le document.
+Si c'est une facture ou un reçu, extrayez les métadonnées (Marchand, Date, Total, Devise).
 
-Répondez uniquement par le type de document, sans faire de phrase. Par exemple, pour un contrat, répondez uniquement : "Contrat".
-`;
+Répondez STRICTEMENT au format JSON suivant :
+{
+  "classification": "Le type de document (ex: Facture, Contrat, etc.)",
+  "full_text": "Le texte intégral extrait du document",
+  "metadata": {
+    "merchant": "Nom de l'entreprise si applicable",
+    "date": "Date du document si applicable",
+    "total": "Montant total si applicable",
+    "currency": "Devise si applicable"
+  }
+}
 
-    // Envoi du message de classification
-    const result = await chatSession.sendMessage(instruction);
+Texte extrait initial (peut être incomplet) : ${text}`;
 
-    // Retourner le type de document après traitement
-    return result.response.text().trim();
-  } catch (error: any) {
-    // Gestion des erreurs spécifiques
-    const errorMessage = error.message || '';
-
-    if (errorMessage.includes('API key not valid') || errorMessage.includes('400')) {
-      console.error('Erreur API Gemini : La clé API fournie n\'est pas valide.');
-      throw new Error('Clé API Gemini invalide. Veuillez vérifier votre fichier .env.');
-    }
-
-    if (error.response) {
-      // Erreur liée à la réponse de l'API
-      console.error('Erreur API :', error.response.data || error.message);
-      throw new Error('Le modèle Google Generative AI n\'a pas pu traiter la demande. Veuillez réessayer plus tard.');
-    } else if (error.request) {
-      // Erreur liée à la requête (ex: problème réseau)
-      console.error('Erreur réseau :', error.request);
-      throw new Error('Problème de connexion au service. Vérifiez votre connexion Internet et réessayez.');
+    let result;
+    if (imageData) {
+      // Nettoyage de la base64 si nécessaire
+      const base64Data = imageData.split(',')[1] || imageData;
+      result = await model.generateContent([
+        prompt,
+        {
+          inlineData: {
+            data: base64Data,
+            mimeType: "image/png"
+          }
+        }
+      ]);
     } else {
-      // Autres types d'erreurs
-      console.error('Erreur inconnue Gemini :', error.message);
-      throw new Error(`Une erreur est survenue lors de l'appel à l'IA : ${error.message}`);
+      result = await model.generateContent(prompt);
     }
+
+    const responseText = result.response.text();
+    return JSON.parse(responseText);
+  } catch (error: any) {
+    console.error('Erreur Gemini :', error);
+    // Fallback minimal en cas d'erreur de parsing ou d'API
+    return {
+      classification: "Inconnu",
+      full_text: text,
+      metadata: {}
+    };
   }
 };
 

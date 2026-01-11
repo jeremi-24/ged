@@ -92,39 +92,38 @@ export default function Contenu() {
     });
 
     const texts: string[] = Object.values(textsObj);
-    let classification;
+    let result;
 
     try {
-      classification = await classifyDocument(texts.join('\n'), {
+      // On envoie la première page comme image pour l'analyse visuelle par Gemini
+      const firstPageImage = imageUrls[0];
+      result = await classifyDocument(texts.join('\n'), {
         apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY!,
         model: 'gemini-3-flash-preview',
-      });
+      }, firstPageImage);
     } catch (error) {
       console.error("Erreur lors de la classification PDF:", error);
-      throw error; // Permet au gestionnaire global de capturer l'échec
+      throw error;
     }
+
+    const { classification, full_text, metadata } = result;
 
     const storageRef = ref(storage, `documents/${file.name}`);
     await uploadBytes(storageRef, file);
     const downloadURL = await getDownloadURL(storageRef);
 
-    const auth = getAuth(); // Initialiser l'authentification
+    const auth = getAuth();
 
-    // Vérifiez l'état de l'utilisateur connecté
     onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        console.error("Aucun utilisateur connecté.");
-        return; // Sortir de la fonction si aucun utilisateur n'est connecté
-      }
+      if (!user) return;
 
-      const userId = user.uid; // Récupération de l'ID de l'utilisateur connecté
+      const userId = user.uid;
 
-      // Ajout des métadonnées et mise à jour de l'état documentDataList
-      // Ajouter le document dans la sous-collection "documents" de l'utilisateur
       const docRef = await addDoc(collection(firestore, "users", userId, "documents"), {
         name: file.name,
         classification,
-        text: texts.join('\n'),
+        text: full_text || texts.join('\n'),
+        metadata: metadata || {},
         createdAt: new Date(),
         url: downloadURL,
         type: file.type,
@@ -132,14 +131,14 @@ export default function Contenu() {
         isArchived: false,
       });
 
-      // Mise à jour de l'état pour afficher le document
       setDocumentDataList(prev => [
         ...prev,
         {
           id: docRef.id,
           name: file.name,
           classification,
-          text: texts.join('\n'),
+          text: full_text || texts.join('\n'),
+          metadata: metadata || {},
           createdAt: new Date(),
           url: downloadURL,
           type: file.type,
@@ -184,40 +183,56 @@ export default function Contenu() {
       },
       async () => {
         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        const { data: { text } } = await Tesseract.recognize(downloadURL, "eng");
 
-        const classification = await classifyDocument(text, {
-          apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY!,
-          model: 'gemini-3-flash-preview',
-        });
+        // Conversion de l'image en base64 pour Gemini
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = async () => {
+          const base64Image = reader.result as string;
 
-        // Ajout des métadonnées et mise à jour de l'état documentDataList
-        const docRef = await addDoc(collection(firestore, "documents"), {
-          name: file.name,
-          classification,
-          text,
-          createdAt: new Date(),
-          url: downloadURL,
-          type: file.type,
-          size: file.size,
-        });
+          try {
+            const result = await classifyDocument("", {
+              apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY!,
+              model: 'gemini-3-flash-preview',
+            }, base64Image);
 
-        setDocumentDataList(prev => [
-          ...prev,
-          {
-            id: docRef.id,
-            name: file.name,
-            classification,
-            text,
-            createdAt: new Date(),
-            url: downloadURL,
-            type: file.type,
-            size: file.size,
-            isArchived: false,
-          },
-        ]);
+            const { classification, full_text, metadata } = result;
+            const auth = getAuth();
+            const user = auth.currentUser;
 
+            if (user) {
+              const docRef = await addDoc(collection(firestore, "users", user.uid, "documents"), {
+                name: file.name,
+                classification,
+                text: full_text,
+                metadata: metadata || {},
+                createdAt: new Date(),
+                url: downloadURL,
+                type: file.type,
+                size: file.size,
+                isArchived: false,
+              });
 
+              setDocumentDataList(prev => [
+                ...prev,
+                {
+                  id: docRef.id,
+                  name: file.name,
+                  classification,
+                  text: full_text,
+                  metadata: metadata || {},
+                  createdAt: new Date(),
+                  url: downloadURL,
+                  type: file.type,
+                  size: file.size,
+                  isArchived: false,
+                },
+              ]);
+            }
+          } catch (error) {
+            console.error("Erreur lors de l'analyse de l'image:", error);
+          }
+        };
       }
     );
   };
@@ -273,7 +288,8 @@ export default function Contenu() {
                   <div key={doc.id} className="mb-4 p-4 border rounded">
                     <p><strong>Nom :</strong> {doc.name}</p>
                     <p><strong>Catégorie :</strong> {doc.classification}</p>
-                    <p><strong>Taille :</strong> {doc.size} octets</p>
+
+                    <p className="mt-2"><strong>Taille :</strong> {doc.size} octets</p>
                     <p><strong>Type :</strong> {doc.type}</p>
                     <p><strong>Date de Création :</strong> {doc.createdAt.toString()}</p>
 
@@ -297,24 +313,37 @@ export default function Contenu() {
                             iconPlacement="right"
                             className="glow-on-hover"
                           >
-                            Voir le texte
+                            Voir le document
                           </ButtonAnimation>
                         </DialogTrigger>
 
                         <DialogPortal>
                           <DialogOverlay />
-                          <DialogContent className="max-w-lg w-full max-h-[80vh] overflow-y-auto">
+                          <DialogContent className="max-w-4xl w-full h-[90vh] overflow-hidden flex flex-col">
                             <DialogHeader>
-                              <DialogTitle>Texte du Document</DialogTitle>
+                              <DialogTitle>Aperçu du Document</DialogTitle>
                               <DialogDescription>
-                                <div className="max-h-[60vh] overflow-y-auto">
-                                  {doc.text} </div>
-
+                                {doc.name}
                               </DialogDescription>
                             </DialogHeader>
-                            <DialogFooter>
-                              <DialogClose>
-                                <button className="p-2 bg-red-500 text-white rounded">
+                            <div className="flex-1 min-h-0 bg-zinc-100 dark:bg-zinc-900 rounded-lg overflow-hidden flex items-center justify-center">
+                              {doc.type.includes('pdf') ? (
+                                <iframe
+                                  src={`${doc.url}#toolbar=0`}
+                                  className="w-full h-full border-none"
+                                  title="Aperçu PDF"
+                                />
+                              ) : (
+                                <img
+                                  src={doc.url}
+                                  alt={doc.name}
+                                  className="max-w-full max-h-full object-contain"
+                                />
+                              )}
+                            </div>
+                            <DialogFooter className="mt-4">
+                              <DialogClose asChild>
+                                <button className="px-4 py-2 bg-zinc-800 text-white rounded-xl hover:bg-zinc-700 transition-colors">
                                   Fermer
                                 </button>
                               </DialogClose>
