@@ -41,7 +41,7 @@ export default function DashboardPage() {
     setDocuments(docs);
     const size = docs.reduce((acc, doc) => acc + (doc.size || 0), 0);
     setStorageUsed(size);
-  }, []); 
+  }, []);
 
   if (!sidebar) return null;
   const { settings, setSettings } = sidebar;
@@ -111,13 +111,13 @@ export default function DashboardPage() {
 
           <div className="space-y-6">
             <StorageCard used={storageUsed} total={5 * 1024 * 1024 * 1024} />
-            
-            <Card className="premium-card bg-primary text-primary-foreground p-6 overflow-hidden relative group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:scale-150 transition-transform duration-500" />
+
+            <Card className="premium-card bg-gradient-to-br from-primary/90 to-primary dark:from-primary/80 dark:to-primary/90 p-6 overflow-hidden relative group border-primary/20">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary-foreground/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:scale-150 transition-transform duration-500" />
               <div className="relative z-10">
-                <h3 className="font-bold text-lg mb-2 italic">Besoin d&apos;aide ?</h3>
-                <p className="text-sm text-white/80 mb-4">Consultez notre guide interactif pour maîtriser YunoDoc.</p>
-                <Button variant="secondary" size="sm" className="rounded-full font-bold bg-white text-primary">Démarrer le guide</Button>
+                <h3 className="font-bold text-lg mb-2 italic text-primary-foreground">Besoin d&apos;aide ?</h3>
+                <p className="text-sm text-primary-foreground/80 mb-4">Consultez notre guide interactif pour maîtriser YunoDoc.</p>
+                <Button variant="secondary" size="sm" className="rounded-full font-bold bg-background text-foreground hover:bg-background/90 shadow-lg">Démarrer le guide</Button>
               </div>
             </Card>
 
