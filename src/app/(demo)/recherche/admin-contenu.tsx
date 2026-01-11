@@ -189,8 +189,8 @@ export default function AdminContent() {
     <div className="rounded-lg border-none mt-3 shadow-sm">
       <div className="p-0">
         <UserInfoDialog />
-        <ResizablePanelGroup direction="horizontal" className="w-full rounded-lg border">
-          <ResizablePanel defaultSize={85} className="p-5">
+        <ResizablePanelGroup direction="horizontal" className="w-full rounded-lg border border-border">
+          <ResizablePanel defaultSize={70} minSize={60} className="p-5">
 
             <div className="flex flex-col items-center space-y-4 w-full px-4">
               <div className="w-full max-w-2xl relative group">
@@ -200,12 +200,12 @@ export default function AdminContent() {
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   placeholder="Recherchez des documents par nom ou contenu (Administration)..."
-                  className="w-full p-4 pl-6 pr-32 border border-slate-200 rounded-2xl shadow-sm search-input-pro bg-white/50 backdrop-blur-sm"
+                  className="w-full p-4 pl-6 pr-32 border border-input rounded-2xl shadow-sm search-input-pro bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground"
                 />
                 <div className="absolute inset-y-0 right-2 flex items-center space-x-2">
                   <button
                     onClick={handleVoiceSearch}
-                    className="btn-professional btn-ghost-pro text-blue-600 hover:bg-blue-50"
+                    className="btn-professional btn-ghost-pro text-primary hover:bg-accent"
                   >
                     Vocal
                   </button>
@@ -217,16 +217,16 @@ export default function AdminContent() {
             <div className="overflow-auto min-h-[300px] max-h-[500px]">
               {Object.keys(groupedResults).map((group) => (
                 <div key={group}>
-                  <h3 className="text-lg font-bold">{group}</h3>
-                  <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 p-4">
+                  <h3 className="text-lg font-bold text-foreground">{group}</h3>
+                  <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 p-4">
                     {groupedResults[group].map((doc) => (
                       <li key={doc.id} className="relative card-pro group/card animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {/* Vérification si doc.url existe avant de construire le lien */}
                         {doc.url ? (
                           <div className="h-full flex flex-col">
                             <Link href={`/discussion?id=${doc.url}&text=${encodeURIComponent(doc.text)}&texte=${encodeURIComponent(doc.url)}`} className="block">
-                              <div className="p-3 bg-slate-50/50">
-                                <div className="aspect-[4/3] w-full relative overflow-hidden rounded-xl border border-slate-200 bg-white">
+                              <div className="p-3 bg-muted/50">
+                                <div className="aspect-[4/3] w-full relative overflow-hidden rounded-xl border border-border bg-background">
                                   <iframe
                                     src={`https://docs.google.com/gview?url=${encodeURIComponent(doc.url)}&embedded=true`}
                                     width="100%"
@@ -238,16 +238,16 @@ export default function AdminContent() {
                             </Link>
 
                             <div className='p-5 space-y-2 flex-grow'>
-                              <h3 className="text-lg font-bold text-slate-800 line-clamp-1 group-hover/card:text-blue-600 transition-colors uppercase tracking-tight">{doc.name}</h3>
+                              <h3 className="text-lg font-bold text-foreground line-clamp-1 group-hover/card:text-primary transition-colors uppercase tracking-tight">{doc.name}</h3>
                               <div className="flex items-center gap-2">
-                                <span className="badge-pro bg-blue-50 text-blue-600 uppercase">
+                                <span className="badge-pro bg-primary/10 text-primary uppercase">
                                   {doc.classification}
                                 </span>
-                                <span className={`badge-pro ${doc.isArchived ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}`}>
+                                <span className={`badge-pro ${doc.isArchived ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-orange-500/10 text-orange-600 dark:text-orange-400'}`}>
                                   {doc.isArchived ? 'Archivé' : 'Actif'}
                                 </span>
                               </div>
-                              <p className="text-slate-400 text-xs font-medium uppercase tracking-widest">{new Date(doc.createdAt).toLocaleDateString()}</p>
+                              <p className="text-muted-foreground text-xs font-medium uppercase tracking-widest">{new Date(doc.createdAt).toLocaleDateString()}</p>
                             </div>
 
                             <div className="p-4 pt-0 flex gap-2 opacity-0 group-hover/card:opacity-100 transition-all duration-300 translate-y-2 group-hover/card:translate-y-0">
@@ -266,7 +266,7 @@ export default function AdminContent() {
                           </div>
                         ) : (
                           <div className="p-8 text-center">
-                            <p className="text-slate-400 text-sm italic">Le document n&apos;est pas disponible.</p>
+                            <p className="text-muted-foreground text-sm italic">Le document n&apos;est pas disponible.</p>
                           </div>
                         )}
                       </li>
@@ -276,15 +276,15 @@ export default function AdminContent() {
               ))}
               {filteredResults.length === 0 && (
                 <div className="flex items-center justify-center min-h-[400px]">
-                  <p className="text-gray-500">Aucun résultat trouvé.</p>
+                  <p className="text-muted-foreground">Aucun résultat trouvé.</p>
                 </div>
               )}
             </div>
           </ResizablePanel>
 
-          <ResizableHandle />
-          <ResizablePanel defaultSize={15} className="p-5">
-            <h2 className="text-xl font-semibold">Aperçu</h2>
+          <ResizableHandle className="bg-transparent hover:bg-primary/20 transition-colors" />
+          <ResizablePanel defaultSize={30} minSize={20} className="p-5 bg-muted/50">
+            <h2 className="text-xl font-semibold text-foreground">Aperçu</h2>
 
             {/* Options de filtre */}
             <div className="w-full space-y-6 mt-6">

@@ -221,16 +221,16 @@ export default function Contenu() {
   };
 
   return (
-    <div className="mt-6 h-[calc(100vh-120px)] flex flex-col bg-white/40 dark:bg-zinc-950/40 backdrop-blur-xl rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-2xl">
+    <div className="mt-6 h-[calc(100vh-120px)] flex flex-col bg-background/40 backdrop-blur-xl rounded-3xl border border-border overflow-hidden shadow-2xl">
       <UserInfoDialog />
       <ResizablePanelGroup direction="horizontal" className="h-full">
-        <ResizablePanel defaultSize={75} minSize={60} className="flex flex-col">
+        <ResizablePanel defaultSize={70} minSize={60} className="flex flex-col">
           {/* Header Search Area */}
-          <div className="p-8 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/30">
+          <div className="p-8 border-b border-border bg-muted/30">
             <div className="max-w-3xl mx-auto w-full space-y-6">
               <div className="text-center space-y-2">
-                <h1 className="text-4xl font-black italic tracking-tighter text-zinc-900 dark:text-zinc-100">Recherche Intelligente</h1>
-                <p className="text-zinc-500 font-medium">Localisez instantanément vos documents auto-classés.</p>
+                <h1 className="text-4xl font-black italic tracking-tighter text-foreground">Recherche Intelligente</h1>
+                <p className="text-muted-foreground font-medium">Localisez instantanément vos documents auto-classés.</p>
               </div>
 
               <div className="flex flex-col items-center space-y-4 w-full px-4">
@@ -241,12 +241,12 @@ export default function Contenu() {
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     placeholder="Recherchez des documents par nom ou contenu..."
-                    className="w-full p-4 pl-6 pr-32 border border-slate-200 rounded-2xl shadow-sm search-input-pro bg-white/50 backdrop-blur-sm"
+                    className="w-full p-4 pl-6 pr-32 border border-input rounded-2xl shadow-sm search-input-pro bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground"
                   />
                   <div className="absolute inset-y-0 right-2 flex items-center space-x-2">
                     <button
                       onClick={handleVoiceSearch}
-                      className="btn-professional btn-ghost-pro text-blue-600 hover:bg-blue-50"
+                      className="btn-professional btn-ghost-pro text-primary hover:bg-accent"
                     >
                       Vocal
                     </button>
@@ -268,19 +268,19 @@ export default function Contenu() {
                   {Object.entries(groupedResults).map(([group, docs]) => (
                     <div key={group} className="space-y-6">
                       <div className="flex items-center gap-4">
-                        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-800 to-transparent" />
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-4 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800">
+                        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground bg-muted px-4 py-1.5 rounded-full border border-border">
                           {group} ({docs.length})
                         </h3>
-                        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-800 to-transparent" />
+                        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
                       </div>
 
-                      <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 p-4">
+                      <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 p-4">
                         {docs.map((doc) => (
                           <li key={doc.id} className="relative card-pro group/card animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <Link href={`/discussion?id=${doc.url}&text=${encodeURIComponent(doc.text)}&texte=${encodeURIComponent(doc.url)}&name=${encodeURIComponent(doc.name)}`} className="block h-full">
-                              <div className="p-3 bg-slate-50/50">
-                                <div className="aspect-[4/3] w-full relative overflow-hidden rounded-xl border border-slate-200 bg-white">
+                              <div className="p-3 bg-muted/50">
+                                <div className="aspect-[4/3] w-full relative overflow-hidden rounded-xl border border-border bg-background">
                                   <iframe
                                     src={`https://docs.google.com/gview?url=${encodeURIComponent(doc.url)}&embedded=true`}
                                     width="100%"
@@ -290,16 +290,16 @@ export default function Contenu() {
                                 </div>
                               </div>
                               <div className='p-5 space-y-2'>
-                                <h3 className="text-lg font-bold text-slate-800 line-clamp-1 group-hover/card:text-blue-600 transition-colors uppercase tracking-tight">{doc.name}</h3>
+                                <h3 className="text-lg font-bold text-foreground line-clamp-1 group-hover/card:text-primary transition-colors uppercase tracking-tight">{doc.name}</h3>
                                 <div className="flex items-center gap-2">
-                                  <span className="badge-pro bg-blue-50 text-blue-600 uppercase">
+                                  <span className="badge-pro bg-primary/10 text-primary uppercase">
                                     {doc.classification}
                                   </span>
-                                  <span className={`badge-pro ${doc.isArchived ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}`}>
+                                  <span className={`badge-pro ${doc.isArchived ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-orange-500/10 text-orange-600 dark:text-orange-400'}`}>
                                     {doc.isArchived ? 'Archivé' : 'Actif'}
                                   </span>
                                 </div>
-                                <p className="text-slate-400 text-xs font-medium uppercase tracking-widest">
+                                <p className="text-muted-foreground text-xs font-medium uppercase tracking-widest">
                                   {new Date(doc.createdAt).toLocaleDateString()}
                                 </p>
                               </div>
@@ -318,8 +318,8 @@ export default function Contenu() {
                   ))}
                 </motion.div>
               ) : (
-                <div className="h-full min-h-[400px] flex flex-col items-center justify-center space-y-4 text-zinc-400">
-                  <div className="w-20 h-20 rounded-3xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
+                <div className="h-full min-h-[400px] flex flex-col items-center justify-center space-y-4 text-muted-foreground">
+                  <div className="w-20 h-20 rounded-3xl bg-muted flex items-center justify-center">
                     <span className="text-3xl font-bold opacity-20">?</span>
                   </div>
                   <p className="font-bold italic text-sm">Aucun résultat trouvé dans la bibliothèque</p>
@@ -329,26 +329,26 @@ export default function Contenu() {
           </div>
         </ResizablePanel>
 
-        <ResizableHandle className="bg-transparent hover:bg-blue-500/20 transition-colors" />
+        <ResizableHandle className="bg-transparent hover:bg-primary/20 transition-colors" />
 
-        <ResizablePanel defaultSize={25} minSize={20} className="bg-zinc-50/50 dark:bg-zinc-900/50 backdrop-blur-md">
+        <ResizablePanel defaultSize={30} minSize={20} className="bg-muted/50 backdrop-blur-md">
           <div className="p-8 space-y-8">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                 <SlidersHorizontal className="w-4 h-4" />
               </div>
-              <h2 className="text-sm font-black uppercase tracking-widest text-zinc-900 dark:text-zinc-100">Filtres Avancés</h2>
+              <h2 className="text-sm font-black uppercase tracking-widest text-foreground">Filtres Avancés</h2>
             </div>
 
             <div className="space-y-6">
               {/* Classification */}
               <div className="space-y-3">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Classification</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Classification</label>
                 <Select value={classificationFilter} onValueChange={setClassificationFilter}>
-                  <SelectTrigger className="w-full h-11 rounded-xl bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-sm font-medium">
+                  <SelectTrigger className="w-full h-11 rounded-xl bg-background border-border shadow-sm font-medium">
                     <SelectValue placeholder="Toutes les catégories" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-zinc-200 dark:border-zinc-800">
+                  <SelectContent className="rounded-xl border-border">
                     <SelectItem value="none">Toutes les catégories</SelectItem>
                     {uniqueClassifications.map((c) => (
                       <SelectItem key={c} value={c} className="rounded-lg capitalize">{c}</SelectItem>
@@ -359,14 +359,14 @@ export default function Contenu() {
 
               {/* Date */}
               <div className="space-y-3">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Période</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Période</label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full h-11 rounded-xl justify-start text-left font-medium bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-sm",
-                        !dateFilter && "text-zinc-500"
+                        "w-full h-11 rounded-xl justify-start text-left font-medium bg-background border-border shadow-sm",
+                        !dateFilter && "text-muted-foreground"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
@@ -387,7 +387,7 @@ export default function Contenu() {
 
               {/* Sorting */}
               <div className="space-y-3">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Trier par</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Trier par</label>
                 <div className="flex flex-col gap-2">
                   {[
                     { id: 'none', label: 'Défaut' },
@@ -400,8 +400,8 @@ export default function Contenu() {
                       className={cn(
                         "flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all border",
                         (opt.id === 'none' ? sortOption === '' : sortOption === opt.id)
-                          ? "bg-blue-500/10 text-blue-600 border-blue-500/20 shadow-sm"
-                          : "bg-white dark:bg-zinc-950 text-zinc-500 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+                          ? "bg-primary/10 text-primary border-primary/20 shadow-sm"
+                          : "bg-background text-muted-foreground border-border hover:border-muted-foreground/50"
                       )}
                     >
                       {opt.label}
@@ -412,8 +412,8 @@ export default function Contenu() {
               </div>
 
               {/* Grouping */}
-              <div className="space-y-3 pt-6 border-t border-zinc-200 dark:border-zinc-800">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Grouper par</label>
+              <div className="space-y-3 pt-6 border-t border-border">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Grouper par</label>
                 <div className="flex gap-2">
                   {[
                     { id: '', label: 'Aucun' },
@@ -426,8 +426,8 @@ export default function Contenu() {
                       className={cn(
                         "flex-1 px-2 py-2 rounded-lg text-[10px] font-black uppercase tracking-tighter transition-all border",
                         groupOption === opt.id
-                          ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 border-transparent shadow-md transform scale-105"
-                          : "bg-white dark:bg-zinc-950 text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                          ? "bg-primary text-primary-foreground border-transparent shadow-md transform scale-105"
+                          : "bg-background text-muted-foreground border-border hover:bg-muted"
                       )}
                     >
                       {opt.label}
@@ -439,7 +439,7 @@ export default function Contenu() {
 
             <Button
               variant="ghost"
-              className="w-full rounded-xl text-zinc-400 hover:text-red-500 hover:bg-red-500/5 text-[10px] font-bold uppercase tracking-widest"
+              className="w-full rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/5 text-[10px] font-bold uppercase tracking-widest"
               onClick={() => {
                 setClassificationFilter('');
                 setDateFilter('');
