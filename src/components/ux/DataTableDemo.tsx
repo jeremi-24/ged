@@ -1,4 +1,4 @@
-"use client"; // Assurez-vous que votre composant est un composant client
+"use client";
 
 import * as React from "react";
 import {
@@ -13,7 +13,27 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, Eye, MoreHorizontal, Search, SearchIcon, Settings, UserCheck } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  MoreHorizontal,
+  Search,
+  Settings,
+  UserCheck,
+  FileText,
+  FileImage,
+  FileCode,
+  FileQuestion,
+  Calendar,
+  Layers,
+  HardDrive,
+  FilePlus2,
+  TrashIcon,
+  SearchIcon
+} from "lucide-react";
 import { ButtonAnimation } from "@/components/snippet/button-animation";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,32 +55,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-// Importer la fonction fetchDocuments
-import { DocumentData } from "@/types/types"; // Importer le type DocumentData
+import { DocumentData } from "@/types/types";
 import { fetchDocuments } from "@/lib/services/CRUD/fetchDocument";
-import { useState } from "react";
-import DocumentPreview from "./DocumentPreview";
-
 import DropdownMenuplus from "@/components/ui/DropdownMenu";
-import {
-  LayoutGridIcon,
-  TrashIcon,
-  Building2,
- 
-  SettingsIcon,
-  ChevronRightIcon,
-  BellIcon,
-  FilePlus2
-} from "lucide-react"
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
-
-// Ajout d'une interface pour les props
 interface DataTableDemoProps {
   onDocumentClick: (document: DocumentData) => void;
-  setSelectedIds: (ids: string) => void; 
-  onRefresh: (refresh: () => void) => void; // Prop pour gérer la prévisualisation
-
+  setSelectedIds: (ids: string) => void;
+  onRefresh: (refresh: () => void) => void;
 }
+
+const getFileIcon = (type: string, name: string) => {
+  if (type.includes('pdf')) return <FileText className="w-4 h-4 text-orange-500" />;
+  if (type.includes('image')) return <FileImage className="w-4 h-4 text-blue-500" />;
+  return <FileQuestion className="w-4 h-4 text-zinc-400" />;
+};
+
+const getClassificationBadge = (classification: string) => {
+  const c = classification?.toLowerCase() || "";
+  if (c.includes('facture')) return <Badge className="bg-blue-500/10 text-blue-600 border-blue-200 hover:bg-blue-500/20 shadow-none capitalize">Facture</Badge>;
+  if (c.includes('contrat')) return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200 hover:bg-emerald-500/20 shadow-none capitalize">Contrat</Badge>;
+  if (c.includes('identite')) return <Badge className="bg-purple-500/10 text-purple-600 border-purple-200 hover:bg-purple-500/20 shadow-none capitalize">Identité</Badge>;
+  return <Badge variant="outline" className="capitalize text-zinc-500 border-zinc-200">{classification || "Inconnu"}</Badge>;
+};
+
 export const columns: ColumnDef<DocumentData>[] = [
   {
     id: "select",
@@ -86,49 +106,56 @@ export const columns: ColumnDef<DocumentData>[] = [
   },
   {
     accessorKey: "name",
-    header: "Name",
-    cell: ({ row }) => <div>{row.getValue("name")}</div>,
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        className="p-0 hover:bg-transparent -ml-2 font-bold text-zinc-500 text-xs uppercase tracking-wider"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Document
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+          {getFileIcon(row.original.type, row.original.name)}
+        </div>
+        <span className="font-bold text-sm italic">{row.getValue("name")}</span>
+      </div>
+    ),
   },
   {
     accessorKey: "classification",
-    header: "Classification",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("classification")}</div>,
+    header: () => (
+      <div className="font-bold text-zinc-500 text-xs uppercase tracking-wider">Classification</div>
+    ),
+    cell: ({ row }) => getClassificationBadge(row.getValue("classification")),
   },
   {
     accessorKey: "createdAt",
-    header: "Date de création",
-    cell: ({ row }) => <div>{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
-  },
-  {
-    accessorKey: "type",
-    header: "Type",
-    cell: ({ row }) => <div>{row.getValue("type")}</div>,
+    header: () => (
+      <div className="font-bold text-zinc-500 text-xs uppercase tracking-wider">Date</div>
+    ),
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2 text-zinc-500 text-sm">
+        <Calendar className="w-3 h-3" />
+        {new Date(row.getValue("createdAt")).toLocaleDateString()}
+      </div>
+    ),
   },
   {
     accessorKey: "size",
-    header: "Taille (bytes)",
-    cell: ({ row }) => <div>{row.getValue("size")}</div>,
-  },
-  {
-    accessorKey: "url", // Ajout de la colonne URL
-    header: "URL du document",
+    header: () => (
+      <div className="font-bold text-zinc-500 text-xs uppercase tracking-wider text-right">Taille</div>
+    ),
     cell: ({ row }) => {
-      const url = row.getValue("url") as string | undefined;
-      const document = row.original; // Obtenez le document original
-     
-
+      const bytes = row.getValue("size") as number;
+      const kb = (bytes / 1024).toFixed(1);
       return (
-        <div>
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          download={name} // Ajoutez cet attribut pour permettre le téléchargement
-        >
-          <Eye />
-        </a>
-      </div>
-      
+        <div className="text-right font-mono text-xs text-zinc-400">
+          {kb} KB
+        </div>
       );
     },
   },
@@ -137,24 +164,28 @@ export const columns: ColumnDef<DocumentData>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const document = row.original;
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-blue-500/10 hover:text-blue-500 rounded-full transition-colors">
               <span className="sr-only">Ouvrir menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="rounded-xl border-none shadow-2xl p-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl">
+            <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 px-2 py-1.5">Options</DropdownMenuLabel>
             <DropdownMenuItem
+              className="rounded-lg gap-2 cursor-pointer"
               onClick={() => navigator.clipboard.writeText(document.id)}
             >
-              Copier l&apos;ID du document
+              <Layers className="w-4 h-4" />
+              Copier l&apos;ID
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Plus</DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-zinc-100 dark:bg-zinc-800" />
+            <DropdownMenuItem className="rounded-lg gap-2 text-red-500 focus:text-red-500 focus:bg-red-50 dark:focus:bg-red-500/10 cursor-pointer">
+              <TrashIcon className="w-4 h-4" />
+              Supprimer
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -162,66 +193,48 @@ export const columns: ColumnDef<DocumentData>[] = [
   },
 ];
 
-export function DataTableDemo({ onRefresh ,onDocumentClick,setSelectedIds }: DataTableDemoProps) {
-  const [documents, setDocuments] = React.useState<DocumentData[]>([]); // État pour stocker les documents
+export function DataTableDemo({ onRefresh, onDocumentClick, setSelectedIds }: DataTableDemoProps) {
+  const [documents, setDocuments] = React.useState<DocumentData[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [selectedIds, setSelectedIdsState] = React.useState<string>("");
-
-  // État pour la pagination
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 6, // Limite de 6 lignes par page
+    pageSize: 8,
   });
 
+  const loadDocuments = React.useCallback(async () => {
+    try {
+      const fetchedDocuments = await fetchDocuments();
+      setDocuments(fetchedDocuments);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des documents :", error);
+    }
+  }, []);
+
   React.useEffect(() => {
-    const loadDocuments = async () => {
-      try {
-        const fetchedDocuments = await fetchDocuments();  // Récupère les documents
-        setDocuments(fetchedDocuments);  // Met à jour l'état avec les documents récupérés
-      } catch (error) {
-        console.error("Erreur lors de la récupération des documents :", error);
-      }
-    };
-    loadDocuments(); 
-    onRefresh(loadDocuments);  // Passe la fonction de rafraîchissement pour être utilisée ailleurs
-     // Récupère les documents à l'initialisation
-  }, [onRefresh]);  // Ajoute `onRefresh` dans la dépendance si c'est une prop modifiable
-  
-  
-      
+    loadDocuments();
+    onRefresh(loadDocuments);
+  }, [loadDocuments, onRefresh]);
 
-    // Fonction pour gérer le clic sur une ligne
-    const handleRowClick = (document: DocumentData) => {
-      onDocumentClick(document); // Envoyer le document sélectionné au parent pour l'aperçu
-      
-      const currentIds = selectedIds.split(",").filter(Boolean); // Convertit la chaîne en tableau et filtre les valeurs vides
+  const handleRowClick = (document: DocumentData) => {
+    onDocumentClick(document);
+    const currentIds = selectedIds.split(",").filter(Boolean);
     const newSelectedIds = currentIds.includes(document.id)
-      ? currentIds.filter(id => id !== document.id).join(",") // Désélectionner si déjà sélectionné
-      : [...currentIds, document.id].join(","); // Ajouter à la sélection si non sélectionné
-
-    setSelectedIdsState(newSelectedIds); // Mettre à jour l'état local
+      ? currentIds.filter(id => id !== document.id).join(",")
+      : [...currentIds, document.id].join(",");
+    setSelectedIdsState(newSelectedIds);
     setSelectedIds(newSelectedIds);
-    
-    
-    };
+  };
 
-    const items = [
-      { icon: <FilePlus2 size={16} />, name: "Nouveau document", href: "/documents/nouveau_document" },
-      { icon: <Search size={16} />, name: "Nouvelle recherche", href: "/recherche" },
-      { icon: <UserCheck size={16} />, name: "Inviter un contact", href: "/inviter-contact" },
-      { icon: <Settings size={16} />, name: "Réglage", href: "/account" },
-      {
-        icon: <TrashIcon size={16} />,
-        name: "Supprimer",
-        customStyle:
-          "!text-red-500 hover:bg-red-500/10 focus-visible:text-red-500 focus-visible:bg-red-500/10 focus-visible:border-red-500/10",
-      },
-    ];
-    
-    
+  const items = [
+    { icon: <FilePlus2 size={16} />, name: "Nouveau document", href: "/documents/nouveau_document" },
+    { icon: <Search size={16} />, name: "Nouvelle recherche", href: "/recherche" },
+    { icon: <UserCheck size={16} />, name: "Inviter un contact", href: "/inviter-contact" },
+    { icon: <Settings size={16} />, name: "Réglage", href: "/account" },
+  ];
 
   const table = useReactTable({
     data: documents,
@@ -239,105 +252,94 @@ export function DataTableDemo({ onRefresh ,onDocumentClick,setSelectedIds }: Dat
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination, // Ajoutez l'état de pagination ici
+      pagination,
     },
   });
- 
-
-
-
-  const paginatedData = table.getPaginationRowModel().rows; 
-
-  // Vérifiez si les résultats sont vides
-  const isNoResults = paginatedData.length === 0;
 
   return (
-    <div className="w-full">
-       <h1 className="text-3xl font-bold text-start  text-emerald-600">Gérer vos documents</h1>
-      <div className="flex items-center py-2">
-        <Input
-          placeholder="Recherchez votre document..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className={`max-w-sm focus:transparent ${isNoResults ? "border-red-500 border-solid" :"border-green-500" } `} // Modifiez la classe en fonction des résultats
-        />
-
-        <DropdownMenuplus items={items} />
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Colonnes <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <div className="w-full space-y-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight italic text-zinc-900 dark:text-zinc-100">Gérer vos documents</h1>
+          <p className="text-sm text-zinc-500">Gérez, visualisez et organisez vos documents classés par l&apos;IA.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <DropdownMenuplus items={items} />
+        </div>
       </div>
-      <div className="rounded-md border h-[300px] overflow-auto"> {/* Ajustez la hauteur ici */}
-        <Table className="w-full">
-          <TableHeader>
+
+      <div className="flex flex-col sm:flex-row items-center gap-4">
+        <div className="relative w-full max-w-sm">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+          <Input
+            placeholder="Recherchez un document..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
+            className="pl-10 h-11 bg-white/50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-blue-500"
+          />
+        </div>
+
+        <div className="flex items-center gap-2 ml-auto">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-11 rounded-xl gap-2 border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50">
+                <Layers className="w-4 h-4" />
+                Colonnes
+                <ChevronDown className="h-4 w-4 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="rounded-xl border-zinc-200 shadow-xl p-1">
+              {table.getAllColumns().filter(c => c.getCanHide()).map(column => (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  className="capitalize rounded-lg"
+                  checked={column.getIsVisible()}
+                  onCheckedChange={v => column.toggleVisibility(!!v)}
+                >
+                  {column.id}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white/30 dark:bg-zinc-950/30 backdrop-blur-sm shadow-sm transition-all duration-300">
+        <Table>
+          <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/50">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+              <TableRow key={headerGroup.id} className="hover:bg-transparent border-zinc-200 dark:border-zinc-800">
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="h-12">
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {paginatedData.length ? (
-              paginatedData.map((row) => (
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                   onClick={() => handleRowClick(row.original)} className="cursor-pointer"
+                  onClick={() => handleRowClick(row.original)}
+                  className="cursor-pointer group hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 border-zinc-200 dark:border-zinc-800 transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                    <TableCell key={cell.id} className="py-4">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Aucun résultat
+                <TableCell colSpan={columns.length} className="h-32 text-center text-zinc-500">
+                  <div className="flex flex-col items-center gap-2">
+                    <Search className="w-8 h-8 opacity-20" />
+                    <p className="font-bold italic">Aucun résultat trouvé</p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
@@ -345,56 +347,34 @@ export function DataTableDemo({ onRefresh ,onDocumentClick,setSelectedIds }: Dat
         </Table>
       </div>
 
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} de{" "}
-          {table.getFilteredRowModel().rows.length} ligne(s) sélectionné(s).
+      <div className="flex items-center justify-between px-2">
+        <div className="text-xs font-bold text-zinc-400 uppercase tracking-widest">
+          {table.getFilteredSelectedRowModel().rows.length} de {table.getFilteredRowModel().rows.length} document(s) sélectionné(s)
         </div>
-        <div className="flex items-center space-x-2">
-  <ButtonAnimation
-    variant="expandIcon"
-    Icon={ChevronLeft}
-    iconPlacement="left"
-    size="sm"
-    onClick={() => {
-      if (pagination.pageIndex > 0) {
-        setPagination((prev) => ({
-          ...prev,
-          pageIndex: prev.pageIndex - 1,
-        }));
-      }
-    }}
-    disabled={pagination.pageIndex === 0}
-  >
-    Avant
-  </ButtonAnimation>
-  <ButtonAnimation
-    variant="expandIcon"
-    Icon={ChevronRight}
-    iconPlacement="right"
-    size="sm"
-    onClick={() => {
-      if (
-        pagination.pageIndex < table.getPageCount() - 1 &&
-        table.getFilteredRowModel().rows.length > 0
-      ) {
-        setPagination((prev) => ({
-          ...prev,
-          pageIndex: prev.pageIndex + 1,
-        }));
-      }
-    }}
-    disabled={
-      pagination.pageIndex >= table.getPageCount() - 1 ||
-      table.getFilteredRowModel().rows.length === 0
-    }
-  >
-    Suivant
-  </ButtonAnimation>
-</div>
-
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg h-9 border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <div className="text-xs font-bold text-zinc-500 px-2 uppercase tracking-tighter">
+            {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg h-9 border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
-     
     </div>
   );
 }
