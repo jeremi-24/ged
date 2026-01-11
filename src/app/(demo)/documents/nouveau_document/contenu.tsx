@@ -10,10 +10,10 @@ import { Progress } from "@/components/ui/progress";
 import { storage, firestore } from "@/firebase/config";
 import { uploadBytesResumable, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { CheckCircle } from 'lucide-react';
-import { addDoc, collection } from "firebase/firestore"; 
+import { addDoc, collection } from "firebase/firestore";
 import classifyDocument from "@/lib/services/classifyDocument";
-import pdfToImages from "@/lib/services/pdfToImages"; 
-import OCRImages from "@/lib/services/OCRImages"; 
+import pdfToImages from "@/lib/services/pdfToImages";
+import OCRImages from "@/lib/services/OCRImages";
 import './style.css';
 import Tesseract from "tesseract.js";
 import { LogEntry } from "@/types/Logs";
@@ -43,7 +43,7 @@ export default function Contenu() {
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogDescription, setDialogDescription] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
-  
+
   // Étape 2: État pour stocker les données des documents
   const [documentDataList, setDocumentDataList] = useState<DocumentData[]>([]);
   const [loadingFinished, setLoadingFinished] = useState(false); // État pour savoir si le chargement est terminé
@@ -54,7 +54,7 @@ export default function Contenu() {
     setDialogOpen(false);
     setLoadingFinished(false);
     setDocumentDataList([]);
-  
+
     try {
       for (const file of files) {
         if (file.type === 'application/pdf') {
@@ -63,21 +63,21 @@ export default function Contenu() {
           await handleImageUpload(file);
         }
       }
-      
+
       setLoadingFinished(true); // Indique que le chargement est terminé
       setDialogTitle("Succès");
       setDialogDescription("Tous les documents ont été chargés et classés avec succès !");
       setDialogOpen(true); // Affiche le message de succès global après tous les téléversements
-      
-    } catch (error) {
+
+    } catch (error: any) {
       setDialogTitle("Échec");
-      setDialogDescription("Échec de l'upload de l'un des documents.");
+      setDialogDescription(error.message || "Échec de l'upload de l'un des documents.");
       setDialogOpen(true);
     } finally {
       setUploading(false);
     }
   };
-  
+
 
   const handlePdfUpload = async (file: File) => {
     const pdfUrl = URL.createObjectURL(file);
@@ -97,31 +97,31 @@ export default function Contenu() {
     try {
       classification = await classifyDocument(texts.join('\n'), {
         apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY!,
-        model: 'gemini-1.5-pro-002',
+        model: 'gemini-3-flash-preview',
       });
     } catch (error) {
-      
-      return;
+      console.error("Erreur lors de la classification PDF:", error);
+      throw error; // Permet au gestionnaire global de capturer l'échec
     }
 
     const storageRef = ref(storage, `documents/${file.name}`);
     await uploadBytes(storageRef, file);
     const downloadURL = await getDownloadURL(storageRef);
-    
+
     const auth = getAuth(); // Initialiser l'authentification
 
-// Vérifiez l'état de l'utilisateur connecté
-onAuthStateChanged(auth, async (user) => {
-    if (!user) {
+    // Vérifiez l'état de l'utilisateur connecté
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
         console.error("Aucun utilisateur connecté.");
         return; // Sortir de la fonction si aucun utilisateur n'est connecté
-    }
+      }
 
-    const userId = user.uid; // Récupération de l'ID de l'utilisateur connecté
+      const userId = user.uid; // Récupération de l'ID de l'utilisateur connecté
 
-    // Ajout des métadonnées et mise à jour de l'état documentDataList
-    // Ajouter le document dans la sous-collection "documents" de l'utilisateur
-    const docRef = await addDoc(collection(firestore, "users", userId, "documents"), {
+      // Ajout des métadonnées et mise à jour de l'état documentDataList
+      // Ajouter le document dans la sous-collection "documents" de l'utilisateur
+      const docRef = await addDoc(collection(firestore, "users", userId, "documents"), {
         name: file.name,
         classification,
         text: texts.join('\n'),
@@ -130,43 +130,43 @@ onAuthStateChanged(auth, async (user) => {
         type: file.type,
         size: file.size,
         isArchived: false,
-    });
+      });
 
-    // Mise à jour de l'état pour afficher le document
-    setDocumentDataList(prev => [
+      // Mise à jour de l'état pour afficher le document
+      setDocumentDataList(prev => [
         ...prev,
         {
-            id: docRef.id,
-            name: file.name,
-            classification,
-            text: texts.join('\n'),
-            createdAt: new Date(),
-            url: downloadURL,
-            type: file.type,
-            size: file.size,
-            isArchived: false,
+          id: docRef.id,
+          name: file.name,
+          classification,
+          text: texts.join('\n'),
+          createdAt: new Date(),
+          url: downloadURL,
+          type: file.type,
+          size: file.size,
+          isArchived: false,
         },
-    ]);
+      ]);
 
-    // Récupération des détails de l'appareil
-    const deviceDetails = getDeviceInfo();
+      // Récupération des détails de l'appareil
+      const deviceDetails = getDeviceInfo();
 
-    // Enregistrement du log après le succès de l'upload
-    const logEntry: LogEntry = {
+      // Enregistrement du log après le succès de l'upload
+      const logEntry: LogEntry = {
         event: "document_uploaded",
         documentId: docRef.id,
         createdAt: new Date(),
         details: `Document ${file.name} a été téléchargé avec succès.`,
         userId: userId, // Ajout de l'ID de l'utilisateur ici
         device: `Depuis l'appareil : ${deviceDetails}`,
-    };
+      };
 
-    // Enregistrement du log dans la sous-collection "logs" de l'utilisateur
-    await logEvent(logEntry, userId);
-});
+      // Enregistrement du log dans la sous-collection "logs" de l'utilisateur
+      await logEvent(logEntry, userId);
+    });
 
 
-  
+
   };
 
   const handleImageUpload = async (file: File) => {
@@ -180,7 +180,7 @@ onAuthStateChanged(auth, async (user) => {
         setProgress(progressPercentage);
       },
       (error) => {
-        
+
       },
       async () => {
         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
@@ -188,7 +188,7 @@ onAuthStateChanged(auth, async (user) => {
 
         const classification = await classifyDocument(text, {
           apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY!,
-          model: 'gemini-1.5-flash',
+          model: 'gemini-3-flash-preview',
         });
 
         // Ajout des métadonnées et mise à jour de l'état documentDataList
@@ -217,7 +217,7 @@ onAuthStateChanged(auth, async (user) => {
           },
         ]);
 
-       
+
       }
     );
   };
@@ -234,99 +234,99 @@ onAuthStateChanged(auth, async (user) => {
 
   return (
     <div className="rounded-lg border-none mt-6">
-      <div className="p-6"> <UserInfoDialog/>  <FileSelector onDrop={handleDrop} />
+      <div className="p-6"> <UserInfoDialog />  <FileSelector onDrop={handleDrop} />
         <div className="flex justify-center items-center min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">
-        <div className="flex-shrink-0 p-4">
-      
-      </div>
+          <div className="flex-shrink-0 p-4">
+
+          </div>
           <div className="flex flex-col relative">
             <FileUpload onDrop={handleDrop} />
             {uploading && (
               <div className="mt-4 flex flex-col items-center">
-              <div className="flex items-center w-full">
-                <Progress value={progress} className="flex-grow " /> {/* Barre de progression */}
-                <Sparkles className="pulse  ml-2 w-8 h-8 "/> {/* Animation à la fin de la barre de progression */}
+                <div className="flex items-center w-full">
+                  <Progress value={progress} className="flex-grow " /> {/* Barre de progression */}
+                  <Sparkles className="pulse  ml-2 w-8 h-8 " /> {/* Animation à la fin de la barre de progression */}
+                </div>
+
+                <p className="mt-2 text-center w-full"> {/* Texte en bas */}
+                  L&apos;IA classe votre document ... {Math.round(progress)}%
+                </p>
               </div>
-              
-              <p className="mt-2 text-center w-full"> {/* Texte en bas */}
-                L&apos;IA classe votre document ... {Math.round(progress)}%
-              </p>
-            </div>
-            
+
             )}
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogContent className="flex flex-col items-center text-center">
-      <CheckCircle className="h-12 w-12 text-green-500 mb-4 bounce" aria-hidden="true" />
-        <DialogTitle>{dialogTitle}</DialogTitle>
-        <DialogDescription className="text-2xl">{dialogDescription}
-         
-        </DialogDescription>
-      </DialogContent>
-    </Dialog>
+              <DialogContent className="flex flex-col items-center text-center">
+                <CheckCircle className="h-12 w-12 text-green-500 mb-4 bounce" aria-hidden="true" />
+                <DialogTitle>{dialogTitle}</DialogTitle>
+                <DialogDescription className="text-2xl">{dialogDescription}
+
+                </DialogDescription>
+              </DialogContent>
+            </Dialog>
 
             {/* Affichage des données des documents uniquement après le chargement terminé */}
             {loadingFinished && documentDataList.length > 0 && (
-  <div className="mt-4">
-    <h2>Documents enregistrés</h2>
-    <br />
-    {documentDataList.map(doc => (
-      <div key={doc.id} className="mb-4 p-4 border rounded">
-        <p><strong>Nom :</strong> {doc.name}</p>
-        <p><strong>Catégorie :</strong> {doc.classification}</p>
-        <p><strong>Taille :</strong> {doc.size} octets</p>
-        <p><strong>Type :</strong> {doc.type}</p>
-        <p><strong>Date de Création :</strong> {doc.createdAt.toString()}</p>
+              <div className="mt-4">
+                <h2>Documents enregistrés</h2>
+                <br />
+                {documentDataList.map(doc => (
+                  <div key={doc.id} className="mb-4 p-4 border rounded">
+                    <p><strong>Nom :</strong> {doc.name}</p>
+                    <p><strong>Catégorie :</strong> {doc.classification}</p>
+                    <p><strong>Taille :</strong> {doc.size} octets</p>
+                    <p><strong>Type :</strong> {doc.type}</p>
+                    <p><strong>Date de Création :</strong> {doc.createdAt.toString()}</p>
 
-        {/* Conteneur flex pour les boutons */}
-        <div className="flex justify-between items-center mt-5">
-          <ButtonAnimation
-            url={doc.url}
-            variant="expandIcon"
-            Icon={Link}
-            iconPlacement="right"
-          >
-            Télécharger
-          </ButtonAnimation>
+                    {/* Conteneur flex pour les boutons */}
+                    <div className="flex justify-between items-center mt-5">
+                      <ButtonAnimation
+                        url={doc.url}
+                        variant="expandIcon"
+                        Icon={Link}
+                        iconPlacement="right"
+                      >
+                        Télécharger
+                      </ButtonAnimation>
 
-          {/* Nouveau bouton pour ouvrir le dialog */}
-          <Dialog>
-            <DialogTrigger asChild>
-              <ButtonAnimation
-                variant="expandIcon"
-                Icon={Eye}
-                iconPlacement="right"
-                className="glow-on-hover"
-              >
-                Voir le texte
-              </ButtonAnimation>
-            </DialogTrigger>
+                      {/* Nouveau bouton pour ouvrir le dialog */}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <ButtonAnimation
+                            variant="expandIcon"
+                            Icon={Eye}
+                            iconPlacement="right"
+                            className="glow-on-hover"
+                          >
+                            Voir le texte
+                          </ButtonAnimation>
+                        </DialogTrigger>
 
-            <DialogPortal>
-              <DialogOverlay />
-              <DialogContent className="max-w-lg w-full max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Texte du Document</DialogTitle>
-                  <DialogDescription>
-                    <div className="max-h-[60vh] overflow-y-auto">
-                       {doc.text} </div>
-                 
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <DialogClose>
-                    <button className="p-2 bg-red-500 text-white rounded">
-                      Fermer
-                    </button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            </DialogPortal>
-          </Dialog>
-        </div>
-      </div>
-    ))}
-  </div>
-)}
+                        <DialogPortal>
+                          <DialogOverlay />
+                          <DialogContent className="max-w-lg w-full max-h-[80vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle>Texte du Document</DialogTitle>
+                              <DialogDescription>
+                                <div className="max-h-[60vh] overflow-y-auto">
+                                  {doc.text} </div>
+
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                              <DialogClose>
+                                <button className="p-2 bg-red-500 text-white rounded">
+                                  Fermer
+                                </button>
+                              </DialogClose>
+                            </DialogFooter>
+                          </DialogContent>
+                        </DialogPortal>
+                      </Dialog>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
 
           </div>

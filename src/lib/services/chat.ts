@@ -6,6 +6,10 @@ type ClassifyDocumentOptions = {
 };
 
 const Chat = async (text: string, options: ClassifyDocumentOptions): Promise<string> => {
+  if (!options.apiKey || options.apiKey === 'your_gemini_api_key') {
+    throw new Error('Clé API Gemini manquante. Vérifiez votre fichier .env.');
+  }
+
   const genAI = new GoogleGenerativeAI(options.apiKey);
   const model = genAI.getGenerativeModel({ model: options.model });
 
@@ -13,7 +17,7 @@ const Chat = async (text: string, options: ClassifyDocumentOptions): Promise<str
     temperature: 0.15, // Réduire la température pour des réponses plus directes
     topP: 0.95,
     topK: 64,
-    
+
     maxOutputTokens: 1000000, // Limitez le nombre de tokens pour obtenir une réponse concise
     responseMimeType: "text/plain",
   };
@@ -29,11 +33,15 @@ const Chat = async (text: string, options: ClassifyDocumentOptions): Promise<str
     const instruction = `${text}`;
 
 
-    const result = await chatSession.sendMessage(instruction); 
-    return result.response.text().trim(); 
+    const result = await chatSession.sendMessage(instruction);
+    return result.response.text().trim();
   } catch (error: any) {
-    console.error('Erreur lors de la classification du document :', error.response?.data || error.message);
-    throw new Error('Classification échouée');
+    if (error.message?.includes('API key not valid')) {
+      console.error('Erreur : Clé API Gemini invalide.');
+      throw new Error('Clé API Gemini invalide.');
+    }
+    console.error('Erreur lors de la session de chat IA :', error.response?.data || error.message);
+    throw new Error('L\'IA n\'a pas pu répondre.');
   }
 };
 

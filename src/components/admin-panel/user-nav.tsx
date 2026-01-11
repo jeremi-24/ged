@@ -21,20 +21,42 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { auth } from "@/firebase/config"; // Importez votre configuration Firebase
+import { auth, firestore } from "@/firebase/config"; // Importez votre configuration Firebase
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 export function UserNav() {
-  const [user, setUser] = useState<{ displayName: string; email: string; photoURL: string | null } | null>(null);
+  const [user, setUser] = useState<{ displayName: string; email: string; photoURL: string | null; role?: string } | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser({
-          displayName: user.displayName || "Utilisateur",
-          email: user.email || "Email non disponible",
-          photoURL: user.photoURL
-        });
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+      if (authUser) {
+        // Fetch additional data from Firestore
+        try {
+          const userDoc = await getDoc(doc(firestore, "users", authUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUser({
+              displayName: `${userData.prenom || ""} ${userData.nom || ""}`.trim() || authUser.displayName || "Utilisateur",
+              email: authUser.email || "Email non disponible",
+              photoURL: userData.photoURL || authUser.photoURL,
+              role: userData.role
+            });
+          } else {
+            setUser({
+              displayName: authUser.displayName || "Utilisateur",
+              email: authUser.email || "Email non disponible",
+              photoURL: authUser.photoURL
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching user data from Firestore:", error);
+          setUser({
+            displayName: authUser.displayName || "Utilisateur",
+            email: authUser.email || "Email non disponible",
+            photoURL: authUser.photoURL
+          });
+        }
       } else {
         setUser(null);
       }
@@ -77,6 +99,11 @@ export function UserNav() {
             <p className="text-xs leading-none text-muted-foreground">
               {user?.email}
             </p>
+            {user?.role && (
+              <p className="text-[10px] font-bold uppercase tracking-wider text-blue-500 mt-1">
+                {user.role}
+              </p>
+            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

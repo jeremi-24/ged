@@ -20,127 +20,127 @@ import {
 } from "@/components/ui/tooltip";
 import { useSidebar } from "@/hooks/use-sidebar";
 import { useStore } from "@/hooks/use-store";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import { Card, CardContent } from "@/components/ui/card";
-import {Contenu} from "./contenu";
+import { Card } from "@/components/ui/card";
+import { Contenu } from "./contenu";
 import DocumentChart from "@/components/ux/DocumentChart";
 import DropdownMenuplus from "@/components/ui/DropdownMenu";
-import { FilePlus2, Search, UserCheck, Settings, TrashIcon } from "lucide-react";
-
+import { FilePlus2, Search, Settings, TrashIcon } from "lucide-react";
+import { useState, useCallback } from "react"; // Ajout de useCallback
+import { DocumentData } from "@/types/types";
+import { StorageCard } from "@/components/ux/StorageCard";
+import { RecentActivity } from "@/components/ux/RecentActivity";
+import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
   const sidebar = useStore(useSidebar, (x) => x);
+  const [documents, setDocuments] = useState<DocumentData[]>([]);
+  const [storageUsed, setStorageUsed] = useState(0);
+
+  // CORRECTION : Utilisation de useCallback pour éviter de recréer la fonction à chaque rendu
+  const handleDataLoaded = useCallback((docs: DocumentData[]) => {
+    setDocuments(docs);
+    const size = docs.reduce((acc, doc) => acc + (doc.size || 0), 0);
+    setStorageUsed(size);
+  }, []); 
+
   if (!sidebar) return null;
   const { settings, setSettings } = sidebar;
 
-   
   const items = [
     { icon: <FilePlus2 size={16} />, name: "Nouveau document", href: "/documents/nouveau_document" },
     { icon: <Search size={16} />, name: "Nouvelle recherche", href: "/recherche" },
-   
     { icon: <Settings size={16} />, name: "Réglage", href: "/account" },
     {
       icon: <TrashIcon size={16} />,
       name: "Supprimer",
-      customStyle:
-        "!text-red-500 hover:bg-red-500/10 focus-visible:text-red-500 focus-visible:bg-red-500/10 focus-visible:border-red-500/10",
+      customStyle: "!text-red-500 hover:bg-red-500/10",
     },
   ];
 
   return (
     <ContentLayout title="Dashboard">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/">Accueil</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Dashboard</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <TooltipProvider>
-        <Card className="rounded-lg border-none mt-4 h-[80vh]"> {/* Hauteur augmentée ici */}
-          <CardContent className="p-0 flex h-full"> {/* Assurez-vous que le contenu prend toute la hauteur */}
-            <div className="flex justify-center items-center w-full h-full">
-              <ResizablePanelGroup
-                direction="horizontal"
-                className="w-full h-full rounded-lg border" // Utilisez h-full pour que le groupe prenne toute la hauteur
-              >
-                {/* Panneau de gauche avec les switches */}
-                <ResizablePanel defaultSize={50} className="p-5 flex flex-col">
-  <div className="flex flex-row flex-wrap gap-4 items-start"> {/* Alignement amélioré */}
-    {/* Premier Switch */}
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div className="flex items-center space-x-2 mb-2"> {/* Ajustement de l'espace vertical */}
-          <Switch
-            id="is-hover-open"
-            onCheckedChange={(x) => setSettings({ isHoverOpen: x })}
-            checked={settings.isHoverOpen}
-          />
-          <Label htmlFor="is-hover-open">Ouvrir en survol</Label>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild><Link href="/">Accueil</Link></BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem><BreadcrumbPage>Dashboard</BreadcrumbPage></BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <h2 className="text-3xl font-extrabold tracking-tight mt-2">Bienvenue sur votre espace</h2>
         </div>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>Lorsque vous survolez la barre latérale en mini état, il s&apos;ouvrira</p>
-      </TooltipContent>
-    </Tooltip>
-    
-    {/* Deuxième Switch */}
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div className="flex items-center space-x-2 mb-2"> {/* Ajustement de l'espace vertical */}
-          <Switch
-            id="disable-sidebar"
-            onCheckedChange={(x) => setSettings({ disabled: x })}
-            checked={settings.disabled}
-          />
-          <Label htmlFor="disable-sidebar">Désactiver la barre latérale</Label>
-        </div>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>Cacher la barre latterale</p>
-      </TooltipContent>
-    </Tooltip>
 
-    {/* DropdownMenuplus */}
-    <div className="flex -mt-4"> {/* Centrage du menu déroulant */}
-      <DropdownMenuplus items={items} />
-    </div>
-  </div>
-  
-  <Contenu />
-</ResizablePanel>
-
-                <ResizableHandle />
-                
-                {/* Panneau de droite */}
-                <ResizablePanel defaultSize={50}>
-                  <ResizablePanelGroup direction="vertical" className="h-full">
-                    <ResizablePanel defaultSize={60} className="flex">
-                    <DocumentChart/>
-                    </ResizablePanel>
-                    <ResizableHandle />
-                    <ResizablePanel defaultSize={40}>
-                      <div className="flex h-full items-center justify-center p-6">
-                        {/* Contenu du panneau inférieur, vide pour l'instant */}
-                      </div>
-                    </ResizablePanel>
-                  </ResizablePanelGroup>
-                </ResizablePanel>
-              </ResizablePanelGroup>
+        <div className="flex items-center gap-4">
+          <TooltipProvider>
+            <div className="flex items-center gap-2 bg-card p-2 rounded-xl border shadow-sm">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="is-hover-open"
+                      onCheckedChange={(x) => setSettings({ isHoverOpen: x })}
+                      checked={settings.isHoverOpen}
+                      className="scale-75"
+                    />
+                    <Label htmlFor="is-hover-open" className="text-xs">Survol</Label>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent><p>Ouvrir la barre latérale au survol</p></TooltipContent>
+              </Tooltip>
+              <div className="w-[1px] h-4 bg-border mx-1" />
+              <DropdownMenuplus items={items} />
             </div>
-          </CardContent>
-        </Card>
-      </TooltipProvider>
+          </TooltipProvider>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        {/* On passe la fonction stable ici */}
+        <Contenu onDataLoaded={handleDataLoaded} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="premium-card bg-card/50 backdrop-blur p-6">
+              <DocumentChart docs={documents} />
+            </Card>
+            <RecentActivity documents={documents} />
+          </div>
+
+          <div className="space-y-6">
+            <StorageCard used={storageUsed} total={5 * 1024 * 1024 * 1024} />
+            
+            <Card className="premium-card bg-primary text-primary-foreground p-6 overflow-hidden relative group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:scale-150 transition-transform duration-500" />
+              <div className="relative z-10">
+                <h3 className="font-bold text-lg mb-2 italic">Besoin d&apos;aide ?</h3>
+                <p className="text-sm text-white/80 mb-4">Consultez notre guide interactif pour maîtriser YunoDoc.</p>
+                <Button variant="secondary" size="sm" className="rounded-full font-bold bg-white text-primary">Démarrer le guide</Button>
+              </div>
+            </Card>
+
+            <Card className="premium-card bg-card/50 backdrop-blur p-6">
+              <h3 className="font-bold mb-4">Actions Rapides</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <Button variant="outline" className="flex flex-col h-auto py-4 gap-2 rounded-2xl" asChild>
+                  <Link href="/documents/nouveau_document">
+                    <FilePlus2 className="w-5 h-5 text-primary" />
+                    <span className="text-xs">Nouveau</span>
+                  </Link>
+                </Button>
+                <Button variant="outline" className="flex flex-col h-auto py-4 gap-2 rounded-2xl" asChild>
+                  <Link href="/recherche">
+                    <Search className="w-5 h-5 text-blue-500" />
+                    <span className="text-xs">Rechercher</span>
+                  </Link>
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
     </ContentLayout>
   );
 }

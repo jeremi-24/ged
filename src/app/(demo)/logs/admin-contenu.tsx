@@ -7,8 +7,10 @@ import React, { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, User, FileText, Info, Monitor } from 'lucide-react'; // Ajout des icônes supplémentaires
 import UserInfoDialog from '@/components/ux/UserInfoDialog';
 
+import { ActivityTimeline } from '@/components/ux/ActivityTimeline';
+
 const LogsComponent: React.FC = () => {
-  const [allLogs, setAllLogs] = useState<Record<string, LogEntry[]>>({}); // Stockage des logs par utilisateur
+  const [allLogs, setAllLogs] = useState<Record<string, LogEntry[]>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,62 +30,56 @@ const LogsComponent: React.FC = () => {
   }, []);
 
   return (
-    <Card className="rounded-lg border-none mt-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <CardContent className="p-6">
-      <UserInfoDialog/>
-        <h2 className="text-3xl font-semibold mb-6"></h2>
-        <div className="flex flex-col items-center overflow-auto min-h-[300px] max-h-[350px]">
-          {loading ? (
-            <p className="text-gray-500">Chargement des activités...</p>
-          ) : error ? (
-            <div className="flex items-center text-red-600">
-              <XCircle className="mr-2" />
-              <p>{error}</p>
-            </div>
-          ) : (
-            Object.keys(allLogs).length === 0 ? (
-              <p className="text-gray-500">Aucune activité trouvée.</p>
-            ) : (
-              Object.entries(allLogs).map(([userId, logs]) => (
-                <div key={userId} className="mb-4"> {/* Conteneur pour chaque utilisateur */}
-                  <h3 className="font-semibold text-lg mb-2">activités pour l&apos;utilisateur: {userId}</h3>
-                  <ul className="w-full space-y-4">
-                    {logs.map((log) => (
-                      <li key={log.documentId} className="flex justify-between items-center p-4 bg-gray-200 border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 transition duration-200">
-                        <div className="flex items-start space-x-4">
-                          <FileText className="text-gray-400 mt-1" />
-                          <div>
-                            <p className="font-medium text-blue-600">{log.event}</p>
-                            <p className="text-gray-600 text-sm">{new Date(log.createdAt).toLocaleString()}</p>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-start space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <User className="text-gray-400" />
-                            <p className="text-gray-500 text-sm">{log.userId}</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Info className="text-gray-400" />
-                            <p className="text-gray-500 text-sm">{log.details}</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Monitor className="text-gray-400" />
-                            <p className="text-gray-500 text-sm">{log.device}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          <CheckCircle className="text-green-500" />
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))
-            )
-          )}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="space-y-6 mt-6">
+      <UserInfoDialog />
+
+      <div className="flex flex-col gap-2">
+        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text text-transparent">
+          Administration des Activités
+        </h2>
+        <p className="text-zinc-500 dark:text-zinc-400">
+          Suivi global de toutes les actions utilisateur sur la plateforme.
+        </p>
+      </div>
+
+      <div className="grid gap-6">
+        {loading ? (
+          <Card className="rounded-3xl border-zinc-100 dark:border-zinc-800 shadow-xl bg-white/50 dark:bg-zinc-950/50 backdrop-blur-xl">
+            <CardContent className="p-20 flex flex-col items-center justify-center gap-4">
+              <div className="w-10 h-10 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
+              <p className="text-zinc-500 animate-pulse">Chargement de toutes les activités...</p>
+            </CardContent>
+          </Card>
+        ) : error ? (
+          <Card className="rounded-3xl border-zinc-100 dark:border-zinc-800 shadow-xl bg-white/50 dark:bg-zinc-950/50 backdrop-blur-xl">
+            <CardContent className="p-20 flex items-center justify-center text-red-500 gap-3">
+              <XCircle className="w-6 h-6" />
+              <p className="font-semibold">{error}</p>
+            </CardContent>
+          </Card>
+        ) : Object.keys(allLogs).length === 0 ? (
+          <Card className="rounded-3xl border-zinc-100 dark:border-zinc-800 shadow-xl bg-white/50 dark:bg-zinc-950/50 backdrop-blur-xl">
+            <CardContent className="p-20 text-center text-zinc-500">
+              Aucune activité trouvée dans le système.
+            </CardContent>
+          </Card>
+        ) : (
+          Object.entries(allLogs).map(([userId, logs]) => (
+            <Card key={userId} className="rounded-3xl border-zinc-100 dark:border-zinc-800 shadow-lg bg-white/50 dark:bg-zinc-950/50 backdrop-blur-xl overflow-hidden">
+              <div className="bg-zinc-100/50 dark:bg-zinc-900/50 px-6 py-4 border-b border-zinc-100 dark:border-zinc-800">
+                <h3 className="font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Activités pour l&apos;utilisateur : <span className="text-blue-500">{userId}</span>
+                </h3>
+              </div>
+              <CardContent className="p-6">
+                <ActivityTimeline logs={logs} />
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
+    </div>
   );
 };
 

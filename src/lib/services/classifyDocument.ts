@@ -9,6 +9,11 @@ type ClassifyDocumentOptions = {
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const classifyDocument = async (text: string, options: ClassifyDocumentOptions): Promise<string> => {
+  if (!options.apiKey || options.apiKey === 'your_gemini_api_key') {
+    console.error('Erreur : Clé API Gemini manquante ou non configurée dans le fichier .env.');
+    throw new Error('La clé API Gemini est manquante. Veuillez configurer NEXT_PUBLIC_GEMINI_API_KEY dans votre fichier .env.');
+  }
+
   const genAI = new GoogleGenerativeAI(options.apiKey);
   const model = genAI.getGenerativeModel({ model: options.model });
 
@@ -70,6 +75,13 @@ Répondez uniquement par le type de document, sans faire de phrase. Par exemple,
     return result.response.text().trim();
   } catch (error: any) {
     // Gestion des erreurs spécifiques
+    const errorMessage = error.message || '';
+
+    if (errorMessage.includes('API key not valid') || errorMessage.includes('400')) {
+      console.error('Erreur API Gemini : La clé API fournie n\'est pas valide.');
+      throw new Error('Clé API Gemini invalide. Veuillez vérifier votre fichier .env.');
+    }
+
     if (error.response) {
       // Erreur liée à la réponse de l'API
       console.error('Erreur API :', error.response.data || error.message);
@@ -80,8 +92,8 @@ Répondez uniquement par le type de document, sans faire de phrase. Par exemple,
       throw new Error('Problème de connexion au service. Vérifiez votre connexion Internet et réessayez.');
     } else {
       // Autres types d'erreurs
-      console.error('Erreur inconnue :', error.message);
-      throw new Error('Une erreur inconnue est survenue lors de la classification du document.');
+      console.error('Erreur inconnue Gemini :', error.message);
+      throw new Error(`Une erreur est survenue lors de l'appel à l'IA : ${error.message}`);
     }
   }
 };

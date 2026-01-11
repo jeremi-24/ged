@@ -35,23 +35,19 @@ export function Sidebar() {
           variant="link"
           asChild
         >
-          <Link href="/dashboard" className="flex items-center gap-2">
-           
+          <Link href="/dashboard" className="flex items-center gap-2 group">
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-bold text-xl group-hover:rotate-6 transition-transform shrink-0">
+              Y
+            </div>
             <h1
               className={cn(
-                "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300",
+                "font-bold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60 whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300",
                 !getOpenState()
                   ? "-translate-x-96 opacity-0 hidden"
                   : "translate-x-0 opacity-100"
               )}
             >
-             <Image
-        src="" // chemin relatif depuis le dossier public
-        alt="Description de l'image"
-        width={300} // largeur de l'image
-        height={300}
-        className="mt-5" // hauteur de l'image
-      />
+              YunoDoc
             </h1>
           </Link>
         </Button>

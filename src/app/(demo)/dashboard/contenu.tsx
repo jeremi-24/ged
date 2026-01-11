@@ -1,121 +1,130 @@
 'use client';
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Book, Trash2, TriangleAlert, Users } from "lucide-react"; // Assurez-vous d'avoir lucide-react installé.
-import { fetchDocumentCounts } from '@/lib/utils/fetchDocumentsCount'; // Importez la fonction utilitaire
+import { Book, Trash2, TriangleAlert, Users } from "lucide-react";
+import { fetchDocuments } from '@/lib/services/CRUD/fetchDocument';
 import { fetchDocumentsWithOneMonthTillArchival } from '@/lib/services/Documentecheance';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import UserInfoDialog from '@/components/ux/UserInfoDialog';
 import { fetchUserCount } from '@/lib/fetchUsers';
-import { useRouter } from 'next/navigation';
+import { DocumentData } from '@/types/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export function Contenu() {
-    const [totalDocuments, setTotalDocuments] = useState(0);
-    const [archivedDocuments, setArchivedDocuments] = useState(0);
-    const [pendingDocuments, setPendingDocuments] = useState(0); // État pour les documents en attente
-    const [activeUsers, setActiveUsers] = useState(0); // État pour les utilisateurs actifs
-    const router = useRouter(); 
+export function Contenu({ onDataLoaded }: { onDataLoaded?: (docs: DocumentData[]) => void }) {
+    const [documents, setDocuments] = useState<DocumentData[]>([]);
+    const [archivedCount, setArchivedCount] = useState(0);
+    const [archivingSoonCount, setArchivingSoonCount] = useState(0);
+    const [activeUsers, setActiveUsers] = useState(0);
+    const [loading, setLoading] = useState(true);
 
-
-    useEffect(() => {
-        const getDocumentCounts = async () => {
-            const counts = await fetchDocumentCounts(); // Appel à la fonction d'utilitaire
-            setTotalDocuments(counts.totalDocuments); // Mettre à jour le total des documents
-            setArchivedDocuments(counts.archivedDocuments); // Mettre à jour le total des documents archivés
-            // Vous pouvez ajuster ces valeurs selon vos besoins ou en récupérant d'autres données
-            setPendingDocuments(15); // Remplacez par la logique pour obtenir le nombre réel
-              // Récupérer le nombre d'utilisateurs actifs
-            const userCount = await fetchUserCount();
-            setActiveUsers(userCount);
-        };
-
-        getDocumentCounts(); // Appeler la fonction pour récupérer les comptes lors du chargement du composant
-    }, []);
-    
-    const [totalDocumentArch, setTotalDocumentArch] = useState(0);
-
-  
     useEffect(() => {
         const auth = getAuth();
-    
-        // Écoute des changements d'état de l'utilisateur
+        let isMounted = true;
+
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-          if (user) {
-            try {
-              // Récupération des documents quand l'utilisateur est authentifié
-              const { total } = await fetchDocumentsWithOneMonthTillArchival(user.uid);
-              setTotalDocumentArch(total);
-            } catch (error) {
-              console.error("Erreur lors de la récupération des documents :", error);
+            if (user) {
+                // On ne déclenche le loading que si on n'a pas encore de données
+                if (documents.length === 0) setLoading(true);
+                
+                try {
+                    const docs = await fetchDocuments();
+                    if (!isMounted) return;
+
+                    setDocuments(docs);
+                    
+                    // Cette ligne causait la boucle avant le useCallback
+                    if (onDataLoaded) onDataLoaded(docs);
+
+                    const archived = docs.filter(d => d.isArchived).length;
+                    setArchivedCount(archived);
+
+                    const { total: soon } = await fetchDocumentsWithOneMonthTillArchival(user.uid);
+                    setArchivingSoonCount(soon);
+
+                    const userCount = await fetchUserCount();
+                    setActiveUsers(userCount);
+                } catch (error) {
+                    console.error("Error fetching dashboard data:", error);
+                } finally {
+                    if (isMounted) setLoading(false);
+                }
+            } else {
+                if (isMounted) setLoading(false);
             }
-          } else {
-            setTotalDocuments(0); // Réinitialise si l'utilisateur est déconnecté
-          }
         });
-    
-        // Nettoyage de l'écoute à la fin du cycle de vie du composant
-        return () => unsubscribe();
-      }, []);
-      const handleTotalDocumentsClick = () => {
-        window.location.href = '/recherche'; // Redirige vers /recherche avec un rechargement de la page
-    };
+
+        return () => {
+            isMounted = false;
+            unsubscribe();
+        };
+    }, [onDataLoaded]); // onDataLoaded est maintenant stable grâce au useCallback du parent
+
+    const metrics = [
+        {
+            title: "Total Documents",
+            value: documents.length,
+            icon: <Book className="text-blue-500" />,
+            bg: "bg-blue-500/10",
+            link: "/recherche"
+        },
+        {
+            title: "Archivés",
+            value: archivedCount,
+            icon: <Trash2 className="text-green-500" />,
+            bg: "bg-green-500/10"
+        },
+        {
+            title: "Archivage (1 mois)",
+            value: archivingSoonCount,
+            icon: <TriangleAlert className="text-red-500" />,
+            bg: "bg-red-500/10"
+        },
+        {
+            title: "Utilisateurs Actifs",
+            value: activeUsers,
+            icon: <Users className="text-indigo-500" />,
+            bg: "bg-indigo-500/10"
+        }
+    ];
+
     return (
-        <Card className="rounded-lg border-none mt-4">
-            <CardContent className="p-0 flex">
-            <UserInfoDialog/>
-                <div className="flex justify-center items-center w-full">
-                    {/* Panneau de gauche contenant 4 cartes */}
-                    <div className="flex flex-1 flex-wrap gap-4 overflow-y-auto max-h-[400px]"> {/* Utilisez overflow-y-auto et une hauteur maximale */}
-                        <div className="flex-1 min-w-[250px]">
-                            <Card
-                             onClick={handleTotalDocumentsClick}
-                             className="h-32 flex justify-between items-center p-4 transform transition-transform duration-300 hover:scale-90">
-                                <div className="flex flex-col">
-                                    <p className="text-4xl font-bold">{totalDocuments}</p>
-                                    <h2 className="text-lg font-semibold">Total Documents</h2>
+        <div className="mt-6">
+            <UserInfoDialog />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                {loading
+                    ? Array.from({ length: 4 }).map((_, i) => (
+                        <Card key={i} className="border-none bg-card/50 backdrop-blur">
+                            <CardContent className="p-6">
+                                <div className="flex justify-between items-start">
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-24" />
+                                        <Skeleton className="h-8 w-12" />
+                                    </div>
+                                    <Skeleton className="h-12 w-12 rounded-2xl" />
                                 </div>
-                                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
-                                    <Book size={24} className="text-blue-500" />
+                            </CardContent>
+                        </Card>
+                    ))
+                    : metrics.map((m, i) => (
+                        <Card
+                            key={i}
+                            className="group hover:shadow-xl transition-all duration-300 border-none bg-card/50 backdrop-blur cursor-pointer"
+                            onClick={() => m.link && (window.location.href = m.link)}
+                        >
+                            <CardContent className="p-6">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground mb-1">{m.title}</p>
+                                        <h3 className="text-3xl font-bold tracking-tight">{m.value}</h3>
+                                    </div>
+                                    <div className={`p-3 rounded-2xl ${m.bg} group-hover:scale-110 transition-transform`}>
+                                        {React.cloneElement(m.icon as React.ReactElement, { size: 24 })}
+                                    </div>
                                 </div>
-                            </Card>
-                        </div>
-                        <div className="flex-1 min-w-[250px]">
-                            <Card className="h-32 flex justify-between items-center p-4 transform transition-transform duration-300 hover:scale-90">
-                                <div className="flex flex-col">
-                                    <p className="text-4xl font-bold">{archivedDocuments}</p>
-                                    <h2 className="text-lg font-semibold">Documents Archivés</h2>
-                                </div>
-                                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-100">
-                                    <Trash2 size={24} className="text-green-500" />
-                                </div>
-                            </Card>
-                        </div>
-                        <div className="flex-1 min-w-[250px]">
-                            <Card className="h-32 flex justify-between items-center p-4 transform transition-transform duration-300 hover:scale-90">
-                                <div className="flex flex-col">
-                                    <p className="text-4xl font-bold">{totalDocumentArch}</p>
-                                    <h2 className="text-lg font-semibold">Archivage (1mois)</h2>
-                                </div>
-                                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100">
-                                    <TriangleAlert size={24} className="text-red-500" />
-                                </div>
-                            </Card>
-                        </div>
-                        <div className="flex-1 min-w-[250px]">
-                            <Card className="h-32 flex justify-between items-center p-4 transform transition-transform duration-300 hover:scale-90">
-                                <div className="flex flex-col">
-                                    <p className="text-4xl font-bold">{activeUsers}</p>
-                                    <h2 className="text-lg font-semibold">Utilisateurs Actifs</h2>
-                                </div>
-                                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-indigo-100">
-                                    <Users size={24} className="text-indigo-500" />
-                                </div>
-                            </Card>
-                        </div>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
+                            </CardContent>
+                        </Card>
+                    ))}
+            </div>
+        </div>
     );
 }

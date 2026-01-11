@@ -7,6 +7,8 @@ import { CheckCircle, XCircle, User, FileText, Info, Monitor } from 'lucide-reac
 import { auth } from '@/firebase/config';
 import UserInfoDialog from '@/components/ux/UserInfoDialog';
 
+import { ActivityTimeline } from '@/components/ux/ActivityTimeline';
+
 const LogsComponent: React.FC = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -20,7 +22,7 @@ const LogsComponent: React.FC = () => {
         return;
       }
 
-      const userId = auth.currentUser.uid; // Obtenir l'ID de l'utilisateur authentifié
+      const userId = auth.currentUser.uid;
       try {
         const fetchedLogs = await fetchLogs(userId);
         setLogs(fetchedLogs);
@@ -33,68 +35,38 @@ const LogsComponent: React.FC = () => {
 
     loadLogs();
   }, []);
-  return (
-    <Card className="rounded-lg border-none mt-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <CardContent className="p-6">
-      <UserInfoDialog/>
-         <h2 className="text-3xl font-semibold mb-6"></h2>
-        <div className="flex flex-col items-center overflow-auto min-h-[300px] max-h-[350px]">
-         
 
+  return (
+    <div className="space-y-6 mt-6">
+      <UserInfoDialog />
+
+      <div className="flex flex-col gap-2">
+        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text text-transparent">
+          Journal d&apos;activité
+        </h2>
+        <p className="text-zinc-500 dark:text-zinc-400">
+          Consultez l&apos;historique complet de vos interactions et modifications.
+        </p>
+      </div>
+
+      <Card className="rounded-3xl border-zinc-100 dark:border-zinc-800 shadow-xl bg-white/50 dark:bg-zinc-950/50 backdrop-blur-xl transition-all duration-500">
+        <CardContent className="p-6 sm:p-8">
           {loading ? (
-            <p className="text-gray-500">Chargement des logs...</p>
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <div className="w-10 h-10 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
+              <p className="text-zinc-500 animate-pulse">Chargement de vos activités...</p>
+            </div>
           ) : error ? (
-            <div className="flex items-center text-red-600   ">
-              <XCircle className="mr-2" />
-              <p>{error}</p>
+            <div className="flex items-center justify-center py-20 text-red-500 gap-3">
+              <XCircle className="w-6 h-6" />
+              <p className="font-semibold">{error}</p>
             </div>
           ) : (
-            <ul className="w-full space-y-4"> {/* Ajout de l'espace entre les éléments */}
-              {logs.map((log) => (
-                <li key={log.documentId} className="flex justify-between items-center p-4 bg-gray-200 border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 transition duration-200">
-                  
-                  {/* Contenu des logs avec les icônes à gauche */}
-                  <div className="flex items-start space-x-4"> 
-                    {/* Icône du document */}
-                    <FileText className="text-gray-400 mt-1" />
-                    <div>
-                      <p className="font-medium text-blue-600">{log.event}</p>
-                      <p className="text-gray-600 text-sm">{new Date(log.createdAt).toLocaleString()}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-start space-y-2">
-                    <div className="flex items-center space-x-2">
-                      {/* Icône utilisateur */}
-                      <User className="text-gray-400" />
-                      <p className="text-gray-500 text-sm">{log.userId}</p>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      {/* Icône des détails */}
-                      <Info className="text-gray-400" />
-                      <p className="text-gray-500 text-sm">{log.details}</p>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      {/* Icône appareil (device) */}
-                      <Monitor className="text-gray-400" />
-                      <p className="text-gray-500 text-sm">{log.device}</p>
-                    </div>
-                  </div>
-
-                  {/* Icône de confirmation (succès) à droite */}
-                  <div className="flex items-center">
-                    <CheckCircle className="text-green-500" />
-                  </div>
-
-                </li>
-              ))}
-            </ul>
+            <ActivityTimeline logs={logs} />
           )}
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
