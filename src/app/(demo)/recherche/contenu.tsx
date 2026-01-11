@@ -300,7 +300,7 @@ export default function Contenu() {
                                   </span>
                                 </div>
                                 <p className="text-muted-foreground text-xs font-medium uppercase tracking-widest">
-                                  {new Date(doc.createdAt).toLocaleDateString()}
+                                  {formatDate(doc.createdAt)}
                                 </p>
                               </div>
                             </Link>

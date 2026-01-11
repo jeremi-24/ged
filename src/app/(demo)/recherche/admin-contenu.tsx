@@ -14,6 +14,14 @@ import { getDeviceInfo } from '@/lib/utils/deviceInfo';
 import { getAuth } from 'firebase/auth';
 import UserInfoDialog from '@/components/ux/UserInfoDialog';
 import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Calendar as CalendarIcon, SlidersHorizontal, ArrowRight } from "lucide-react";
 
 export default function AdminContent() {
   const { searchText, setSearchText, results, startVoiceSearch } = useSearch();
@@ -185,6 +193,20 @@ export default function AdminContent() {
     }
   };
 
+  const formatDate = (date: any) => {
+    if (!date) return "N/A";
+    try {
+      if (date && typeof date === 'object' && 'seconds' in date) {
+        return new Date(date.seconds * 1000).toLocaleDateString();
+      }
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return "N/A";
+      return d.toLocaleDateString();
+    } catch (e) {
+      return "N/A";
+    }
+  };
+
   return (
     <div className="rounded-lg border-none mt-3 shadow-sm">
       <div className="p-0">
@@ -247,7 +269,7 @@ export default function AdminContent() {
                                   {doc.isArchived ? 'Archivé' : 'Actif'}
                                 </span>
                               </div>
-                              <p className="text-muted-foreground text-xs font-medium uppercase tracking-widest">{new Date(doc.createdAt).toLocaleDateString()}</p>
+                              <p className="text-muted-foreground text-xs font-medium uppercase tracking-widest">{formatDate(doc.createdAt)}</p>
                             </div>
 
                             <div className="p-4 pt-0 flex gap-2 opacity-0 group-hover/card:opacity-100 transition-all duration-300 translate-y-2 group-hover/card:translate-y-0">
@@ -284,65 +306,124 @@ export default function AdminContent() {
 
           <ResizableHandle className="bg-transparent hover:bg-primary/20 transition-colors" />
           <ResizablePanel defaultSize={30} minSize={20} className="p-5 bg-muted/50">
-            <h2 className="text-xl font-semibold text-foreground">Aperçu</h2>
-
-            {/* Options de filtre */}
-            <div className="w-full space-y-6 mt-6">
-              {/* Filtre de classification */}
-              <div>
-                <label className="filter-label">Classification</label>
-                <select
-                  value={classificationFilter}
-                  onChange={(e) => setClassificationFilter(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="">Toutes les classifications</option>
-                  {uniqueClassifications.map((classification) => (
-                    <option key={classification} value={classification}>
-                      {classification}
-                    </option>
-                  ))}
-                </select>
+            <div className="p-3 space-y-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <SlidersHorizontal className="w-4 h-4" />
+                </div>
+                <h2 className="text-sm font-black uppercase tracking-widest text-foreground">Filtres Avancés</h2>
               </div>
 
-              {/* Filtre de date */}
-              <div>
-                <label className="filter-label">Date</label>
-                <input
-                  type="date"
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
-                  className="filter-select"
-                />
+              <div className="space-y-6">
+                {/* Classification */}
+                <div className="space-y-3">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Classification</label>
+                  <Select value={classificationFilter} onValueChange={setClassificationFilter}>
+                    <SelectTrigger className="w-full h-11 rounded-xl bg-background border-border shadow-sm font-medium">
+                      <SelectValue placeholder="Toutes les catégories" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-border">
+                      <SelectItem value="none">Toutes les catégories</SelectItem>
+                      {uniqueClassifications.map((c) => (
+                        <SelectItem key={c} value={c} className="rounded-lg capitalize">{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Date */}
+                <div className="space-y-3">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Période</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full h-11 rounded-xl justify-start text-left font-medium bg-background border-border shadow-sm",
+                          !dateFilter && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
+                        {dateFilter ? format(new Date(dateFilter), "PPP", { locale: fr }) : "Sélectionner une date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 rounded-2xl border-none shadow-2xl" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={dateFilter ? new Date(dateFilter) : undefined}
+                        onSelect={(date) => setDateFilter(date ? date.toISOString().substring(0, 10) : "")}
+                        initialFocus
+                        className="rounded-2xl"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {/* Sorting */}
+                <div className="space-y-3">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Trier par</label>
+                  <div className="flex flex-col gap-2">
+                    {[
+                      { id: 'none', label: 'Défaut' },
+                      { id: 'name', label: 'Nom du fichier' },
+                      { id: 'date', label: 'Date d\'ajout' }
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setSortOption(opt.id === 'none' ? '' : opt.id)}
+                        className={cn(
+                          "flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all border",
+                          (opt.id === 'none' ? sortOption === '' : sortOption === opt.id)
+                            ? "bg-primary/10 text-primary border-primary/20 shadow-sm"
+                            : "bg-background text-muted-foreground border-border hover:border-muted-foreground/50"
+                        )}
+                      >
+                        {opt.label}
+                        {(opt.id === 'none' ? sortOption === '' : sortOption === opt.id) && <ArrowRight className="w-3 h-3" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Grouping */}
+                <div className="space-y-3 pt-6 border-t border-border">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Grouper par</label>
+                  <div className="flex gap-2">
+                    {[
+                      { id: '', label: 'Aucun' },
+                      { id: 'classification', label: 'Catégorie' },
+                      { id: 'date', label: 'Date' }
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setGroupOption(opt.id)}
+                        className={cn(
+                          "flex-1 px-2 py-2 rounded-lg text-[10px] font-black uppercase tracking-tighter transition-all border",
+                          groupOption === opt.id
+                            ? "bg-primary text-primary-foreground border-transparent shadow-md transform scale-105"
+                            : "bg-background text-muted-foreground border-border hover:bg-muted"
+                        )}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              {/* Options de tri */}
-              <div>
-                <label className="filter-label">Trier par</label>
-                <select
-                  value={sortOption}
-                  onChange={(e) => setSortOption(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="">Pertinence</option>
-                  <option value="name">Nom (A-Z)</option>
-                  <option value="date">Date de création</option>
-                </select>
-              </div>
-
-              {/* Options de groupement */}
-              <div>
-                <label className="filter-label">Grouper par</label>
-                <select
-                  value={groupOption}
-                  onChange={(e) => setGroupOption(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="">Aucun groupement</option>
-                  <option value="classification">Classification</option>
-                  <option value="date">Date</option>
-                </select>
-              </div>
+              <Button
+                variant="ghost"
+                className="w-full rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/5 text-[10px] font-bold uppercase tracking-widest"
+                onClick={() => {
+                  setClassificationFilter('');
+                  setDateFilter('');
+                  setSortOption('');
+                  setGroupOption('');
+                  setSearchText('');
+                }}
+              >
+                Réinitialiser
+              </Button>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
