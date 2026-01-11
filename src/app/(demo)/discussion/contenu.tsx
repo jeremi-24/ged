@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import Chat from '@/lib/services/chat';
 import { Card, CardContent } from '@/components/ui/card';
@@ -134,8 +135,13 @@ const Contenu = () => {
                     title="Document Preview"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center p-4">
-                    <img src={documentUrl} alt="Preview" className="max-w-full max-h-full object-contain rounded-lg shadow-lg" />
+                  <div className="w-full h-full flex items-center justify-center p-4 relative min-h-[300px]">
+                    <Image
+                      src={documentUrl}
+                      alt="Preview"
+                      fill
+                      className="object-contain rounded-lg shadow-lg"
+                    />
                   </div>
                 )
               ) : (
@@ -251,7 +257,7 @@ const Contenu = () => {
                 </Button>
               </form>
               <p className="text-[10px] text-center text-zinc-400 mt-2 font-medium">
-                L'IA peut faire des erreurs, vérifiez les informations importantes.
+                L&apos;IA peut faire des erreurs, vérifiez les informations importantes.
               </p>
             </div>
           </Card>

@@ -25,13 +25,13 @@ export function Contenu({ onDataLoaded }: { onDataLoaded?: (docs: DocumentData[]
             if (user) {
                 // On ne déclenche le loading que si on n'a pas encore de données
                 if (documents.length === 0) setLoading(true);
-                
+
                 try {
                     const docs = await fetchDocuments();
                     if (!isMounted) return;
 
                     setDocuments(docs);
-                    
+
                     // Cette ligne causait la boucle avant le useCallback
                     if (onDataLoaded) onDataLoaded(docs);
 
@@ -57,7 +57,7 @@ export function Contenu({ onDataLoaded }: { onDataLoaded?: (docs: DocumentData[]
             isMounted = false;
             unsubscribe();
         };
-    }, [onDataLoaded]); // onDataLoaded est maintenant stable grâce au useCallback du parent
+    }, [onDataLoaded, documents.length]); // onDataLoaded est maintenant stable grâce au useCallback du parent
 
     const metrics = [
         {

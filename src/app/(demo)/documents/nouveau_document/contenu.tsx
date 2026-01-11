@@ -3,6 +3,7 @@
 import { ButtonAnimation } from "@/components/snippet/button-animation";
 import { Eye, Link, Sparkles, FileText, Loader2, CheckCircle2, Clock, BrainCircuit, HardDriveDownload, AlertCircle, ChevronRight, Wand2 } from "lucide-react";
 import { useState, useCallback } from "react";
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import FileUpload from "@/components/ux/FileUpload";
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogFooter, DialogClose, DialogPortal, DialogOverlay, DialogTrigger } from "@/components/ui/dialog";
@@ -421,11 +422,16 @@ export default function Contenu() {
                                     <Button variant="ghost" size="icon" className="rounded-full"><AlertCircle className="rotate-45" /></Button>
                                   </DialogClose>
                                 </div>
-                                <div className="flex-1 min-h-0 bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center">
+                                <div className="flex-1 min-h-0 bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center relative">
                                   {doc.type.includes('pdf') ? (
                                     <iframe src={`${doc.url}#toolbar=0`} className="w-full h-full" title="PDF Preview" />
                                   ) : (
-                                    <img src={doc.url} alt={doc.name} className="max-w-full max-h-full object-contain p-4" />
+                                    <Image
+                                      src={doc.url}
+                                      alt={doc.name}
+                                      fill
+                                      className="object-contain p-4"
+                                    />
                                   )}
                                 </div>
                                 <div className="p-6 bg-white dark:bg-zinc-900 flex justify-end gap-4">
