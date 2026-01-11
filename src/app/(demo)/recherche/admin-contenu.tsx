@@ -6,16 +6,14 @@ import { useSearch } from '@/lib/services/Searchall';
 import Link from 'next/link';
 import { Timestamp } from 'firebase/firestore';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { Search, Mic, Share2, Trash2, Download, X, Sparkle } from "lucide-react";
 import './style.css';
-import { useToast } from "@/hooks/use-toast";
-import Image from 'next/image';
-import { DialogTitle } from '@/components/ui/dialog';
 import { LogEntry } from '@/types/Logs';
+import { DialogTitle } from '@/components/ui/dialog';
 import { logEvent } from '@/lib/services/logEvent';
 import { getDeviceInfo } from '@/lib/utils/deviceInfo';
 import { getAuth } from 'firebase/auth';
 import UserInfoDialog from '@/components/ux/UserInfoDialog';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AdminContent() {
   const { searchText, setSearchText, results, startVoiceSearch } = useSearch();
@@ -47,7 +45,7 @@ export default function AdminContent() {
     };
   }, [searchText]);
 
-  
+
 
   const filteredResults = results.filter(doc => {
     const matchesClassification = classificationFilter ? doc.classification === classificationFilter : true;
@@ -71,26 +69,26 @@ export default function AdminContent() {
       alert('Votre navigateur ne prend pas en charge la recherche vocale.');
       return;
     }
-  
+
     const recognition = new (window as any).webkitSpeechRecognition();
     recognition.lang = 'fr-FR'; // Définir la langue
-  
+
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript; // Récupère le texte reconnu
       setSearchText(transcript); // Met à jour le texte de recherche
     };
-  
+
     recognition.onerror = (event: any) => {
       console.error('Erreur de reconnaissance vocale:', event.error);
-  
+
       toast({
-          title: "Erreur",
-          description: `Erreur de reconnaissance vocale: ${event.error}`, // Utilisation correcte de la variable event.error
-          variant: "destructive",
+        title: "Erreur",
+        description: `Erreur de reconnaissance vocale: ${event.error}`, // Utilisation correcte de la variable event.error
+        variant: "destructive",
       });
-  };
-  
-  
+    };
+
+
     recognition.start(); // Démarre la reconnaissance vocale
   };
 
@@ -112,20 +110,20 @@ export default function AdminContent() {
 
   // Groupement des résultats
   const groupedResults = groupOption ? sortedResults.reduce((groups, doc) => {
-    const groupKey = groupOption === 'classification' 
-      ? doc.classification 
+    const groupKey = groupOption === 'classification'
+      ? doc.classification
       : (() => {
-          let date;
-          if (doc.createdAt instanceof Timestamp) {
-            date = doc.createdAt.toDate();
-          } else if (typeof doc.createdAt === 'string') {
-            date = new Date(doc.createdAt);
-          } else {
-            return null;
-          }
-          return isNaN(date.getTime()) ? null : date.toISOString().substring(0, 10);
-        })();
-    
+        let date;
+        if (doc.createdAt instanceof Timestamp) {
+          date = doc.createdAt.toDate();
+        } else if (typeof doc.createdAt === 'string') {
+          date = new Date(doc.createdAt);
+        } else {
+          return null;
+        }
+        return isNaN(date.getTime()) ? null : date.toISOString().substring(0, 10);
+      })();
+
     if (groupKey) {
       if (!groups[groupKey]) {
         groups[groupKey] = [];
@@ -144,7 +142,7 @@ export default function AdminContent() {
       const response = await fetch(url);
       const blob = await response.blob();
       const urlBlob = window.URL.createObjectURL(blob);
-      
+
       const a = document.createElement('a');
       a.href = urlBlob;
       a.download = fileName; // Utiliser le nom du document ici
@@ -154,226 +152,202 @@ export default function AdminContent() {
       window.URL.revokeObjectURL(urlBlob); // Libérer l'URL blob
 
       const deviceDetails = getDeviceInfo();
-const auth = getAuth();
-const user = auth.currentUser; // Obtenez l'utilisateur connecté
+      const auth = getAuth();
+      const user = auth.currentUser; // Obtenez l'utilisateur connecté
 
-// Enregistrement du log après le succès du téléchargement
-const logEntry: LogEntry = {
-    event: "téléchargement_de_document",
-    documentId: fileName, // Utiliser fileName ou un ID unique si disponible
-    createdAt: new Date(),
-    details: `Le document ${fileName} a été téléchargé avec succès`,
-    userId: user ? user.uid : "Utilisateur non connecté", // Ajouter l'ID utilisateur ici si disponible
-    device: `Depuis ${deviceDetails}`,
-};
+      // Enregistrement du log après le succès du téléchargement
+      const logEntry: LogEntry = {
+        event: "téléchargement_de_document",
+        documentId: fileName, // Utiliser fileName ou un ID unique si disponible
+        createdAt: new Date(),
+        details: `Le document ${fileName} a été téléchargé avec succès`,
+        userId: user ? user.uid : "Utilisateur non connecté", // Ajouter l'ID utilisateur ici si disponible
+        device: `Depuis ${deviceDetails}`,
+      };
 
-if (user) {
-  await logEvent(logEntry, user.uid); // Appel à logEvent avec user.uid
-} else {
-  console.error("Erreur : utilisateur non connecté");
-}
+      if (user) {
+        await logEvent(logEntry, user.uid); // Appel à logEvent avec user.uid
+      } else {
+        console.error("Erreur : utilisateur non connecté");
+      }
 
-  
+
       setDialogTitle("");
       setDialogDescription(`Le document ${fileName} a été téléchargé avec succès.`);
       setDialogOpen(true);
     } catch (error) {
-     
+
       toast({
         title: "Erreur",
         description: `Erreur lors du téléchargement du fichier: ${error}`, // Utilisation correcte de la variable event.error
         variant: "destructive",
-    });
+      });
     }
   };
-    
+
   return (
     <div className="rounded-lg border-none mt-3 shadow-sm">
-    <div className="p-0">
-    <UserInfoDialog/>
-      <ResizablePanelGroup direction="horizontal" className="w-full rounded-lg border">
-        <ResizablePanel defaultSize={85} className="p-5">
-         
-          <div className="flex flex-col items-center space-y-4">
-            <div className="w-full max-w-xl rounded-lg relative">
-              <input
-                id='search'
-                type="text"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder="Recherchez des documents..."
-                className="w-full p-3 pl-12 pr-12 border border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              <div className="absolute inset-y-0 -left-2 flex items-center">
-                <Image
-                  src="/star.png"
-                  alt="Description de l'image"
-                  width={60}
-                  height={60}
-                  className="" 
+      <div className="p-0">
+        <UserInfoDialog />
+        <ResizablePanelGroup direction="horizontal" className="w-full rounded-lg border">
+          <ResizablePanel defaultSize={85} className="p-5">
+
+            <div className="flex flex-col items-center space-y-4 w-full px-4">
+              <div className="w-full max-w-2xl relative group">
+                <input
+                  id='search'
+                  type="text"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  placeholder="Recherchez des documents par nom ou contenu (Administration)..."
+                  className="w-full p-4 pl-6 pr-32 border border-slate-200 rounded-2xl shadow-sm search-input-pro bg-white/50 backdrop-blur-sm"
+                />
+                <div className="absolute inset-y-0 right-2 flex items-center space-x-2">
+                  <button
+                    onClick={handleVoiceSearch}
+                    className="btn-professional btn-ghost-pro text-blue-600 hover:bg-blue-50"
+                  >
+                    Vocal
+                  </button>
+                </div>
+              </div>
+            </div>
+
+
+            <div className="overflow-auto min-h-[300px] max-h-[500px]">
+              {Object.keys(groupedResults).map((group) => (
+                <div key={group}>
+                  <h3 className="text-lg font-bold">{group}</h3>
+                  <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 p-4">
+                    {groupedResults[group].map((doc) => (
+                      <li key={doc.id} className="relative card-pro group/card animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        {/* Vérification si doc.url existe avant de construire le lien */}
+                        {doc.url ? (
+                          <div className="h-full flex flex-col">
+                            <Link href={`/discussion?id=${doc.url}&text=${encodeURIComponent(doc.text)}&texte=${encodeURIComponent(doc.url)}`} className="block">
+                              <div className="p-3 bg-slate-50/50">
+                                <div className="aspect-[4/3] w-full relative overflow-hidden rounded-xl border border-slate-200 bg-white">
+                                  <iframe
+                                    src={`https://docs.google.com/gview?url=${encodeURIComponent(doc.url)}&embedded=true`}
+                                    width="100%"
+                                    height="100%"
+                                    className="w-full h-full grayscale-[0.5] group-hover/card:grayscale-0 transition-all duration-500"
+                                  />
+                                </div>
+                              </div>
+                            </Link>
+
+                            <div className='p-5 space-y-2 flex-grow'>
+                              <h3 className="text-lg font-bold text-slate-800 line-clamp-1 group-hover/card:text-blue-600 transition-colors uppercase tracking-tight">{doc.name}</h3>
+                              <div className="flex items-center gap-2">
+                                <span className="badge-pro bg-blue-50 text-blue-600 uppercase">
+                                  {doc.classification}
+                                </span>
+                                <span className={`badge-pro ${doc.isArchived ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}`}>
+                                  {doc.isArchived ? 'Archivé' : 'Actif'}
+                                </span>
+                              </div>
+                              <p className="text-slate-400 text-xs font-medium uppercase tracking-widest">{new Date(doc.createdAt).toLocaleDateString()}</p>
+                            </div>
+
+                            <div className="p-4 pt-0 flex gap-2 opacity-0 group-hover/card:opacity-100 transition-all duration-300 translate-y-2 group-hover/card:translate-y-0">
+                              <Link href={`/discussion?id=${doc.url}&text=${encodeURIComponent(doc.text)}&texte=${encodeURIComponent(doc.url)}`} className="flex-1">
+                                <button className="w-full btn-professional btn-outline-pro">
+                                  Ouvrir
+                                </button>
+                              </Link>
+                              <button
+                                onClick={() => downloadFile(doc.url, doc.name)}
+                                className="flex-1 btn-professional btn-primary-pro"
+                              >
+                                Télécharger
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-8 text-center">
+                            <p className="text-slate-400 text-sm italic">Le document n&apos;est pas disponible.</p>
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+              {filteredResults.length === 0 && (
+                <div className="flex items-center justify-center min-h-[400px]">
+                  <p className="text-gray-500">Aucun résultat trouvé.</p>
+                </div>
+              )}
+            </div>
+          </ResizablePanel>
+
+          <ResizableHandle />
+          <ResizablePanel defaultSize={15} className="p-5">
+            <h2 className="text-xl font-semibold">Aperçu</h2>
+
+            {/* Options de filtre */}
+            <div className="w-full space-y-6 mt-6">
+              {/* Filtre de classification */}
+              <div>
+                <label className="filter-label">Classification</label>
+                <select
+                  value={classificationFilter}
+                  onChange={(e) => setClassificationFilter(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="">Toutes les classifications</option>
+                  {uniqueClassifications.map((classification) => (
+                    <option key={classification} value={classification}>
+                      {classification}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Filtre de date */}
+              <div>
+                <label className="filter-label">Date</label>
+                <input
+                  type="date"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="filter-select"
                 />
               </div>
-              <div className="absolute inset-y-0 right-3 flex items-center cursor-pointer">
-              <div className="group relative p-2 rounded-full">
-  <div onClick={handleVoiceSearch} className="flex items-center">
-    <Mic  className="hover:text-green-600 text-gray-400 mr-1" /> {/* Icône Mic */}
-    {showTooltip && (
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mt-2 p-2 bg-blue-500 text-white text-sm rounded shadow-lg animate-fadeInOut">
-          Cliquez ici pour commencer !
-        </div>
-      )}
-   
-  </div>
-  <div className="bg-zinc-800 p-2 rounded-md group-hover:flex hidden absolute top-1/2 -translate-y-1/2 -left-2 -translate-x-full">
-    <span className="text-zinc-400 whitespace-nowrap">Cliquer pour une recherche vocale</span>
-    <div className="bg-inherit rotate-45 p-1 absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2"></div>
-  </div>
-</div>
 
+              {/* Options de tri */}
+              <div>
+                <label className="filter-label">Trier par</label>
+                <select
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="">Pertinence</option>
+                  <option value="name">Nom (A-Z)</option>
+                  <option value="date">Date de création</option>
+                </select>
+              </div>
+
+              {/* Options de groupement */}
+              <div>
+                <label className="filter-label">Grouper par</label>
+                <select
+                  value={groupOption}
+                  onChange={(e) => setGroupOption(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="">Aucun groupement</option>
+                  <option value="classification">Classification</option>
+                  <option value="date">Date</option>
+                </select>
               </div>
             </div>
-          </div>
-  
-          
-          <div className="overflow-auto min-h-[300px] max-h-[500px]">
-            {Object.keys(groupedResults).map((group) => (
-              <div key={group}>
-                <h3 className="text-lg font-bold">{group}</h3>
-                <ul className="grid grid-cols-1 gap-y-10 gap-x-5 md:grid-cols-2 p-5 lg:grid-cols-3">
-                  {groupedResults[group].map((doc) => (
-                   <li key={doc.id} className="relative border border-gray-200 rounded-xl card hover:shadow-md transition duration-150">
-                   {/* Vérification si doc.url existe avant de construire le lien */}
-                   {doc.url ? (
-                     <Link href={`/discussion?id=${doc.url}&text=${encodeURIComponent(doc.text)}&texte=${encodeURIComponent(doc.url)}`}>
-                       <div className="flex-grow p-2">
-                         <iframe
-                           src={`https://docs.google.com/gview?url=${encodeURIComponent(doc.url)}&embedded=true`}
-                           width="100%"
-                           height="100%"
-                           className="border rounded-xl"
-                           style={{ minHeight: '200px' }}
-                         />
-                       </div>
-                     </Link>
-                   ) : (
-                     <div className="flex-grow p-2">
-                       <p className="text-gray-500">Le document n&apos;est pas disponible.</p>
-                     </div>
-                   )}
-               
-                   <div className='mb-3 ml-3'>
-                     <h3 className="text-lg font-semibold text-green-600">{doc.name}</h3>
-                     <p className="text-gray-600">{doc.classification}</p>
-                     <p className={`text-gray-600 ${doc.isArchived ? 'text-green-600' : 'text-red-600'}`}>
-                       {doc.isArchived !== undefined 
-                         ? (doc.isArchived ? 'archivé' : 'non archivé') 
-                         : 'Non spécifié'}
-                     </p>
-                     <p className="text-gray-500 text-sm">{new Date(doc.createdAt).toLocaleDateString()}</p>
-                   </div>
-               
-                   {/* Cercle avec icône de téléchargement */}
-                   {doc.url && (
-                      <div className="relative ">
-                      {/* Bouton en haut */}
-                      <Link href={`/discussion?id=${doc.url}&text=${encodeURIComponent(doc.text)}&texte=${encodeURIComponent(doc.url)}`}>
-                      <button 
-                       
-                        className="absolute bottom-2 right-2 bg-green-600 text-white rounded-full p-2 shadow-lg hover:bg-blue-700 transition duration-150"
-                      >
-                        <Sparkle className="w-5 h-5" />
-                      </button></Link>
-                
-                      {/* Bouton plus bas et plus petit */}
-                      <button 
-                        onClick={() => downloadFile(doc.url, doc.name)}
-                        className="absolute bottom-12 right-2 bg-green-600 text-white rounded-full p-2 shadow-lg hover:bg-blue-700 transition duration-150"
-                      >
-                        <Download className="w-5 h-5" />
-                      </button>
-                    </div>
-                   )}
-                 </li>
-               ))}
-                </ul>
-              </div>
-            ))}
-            {filteredResults.length === 0 && (
-              <div className="flex items-center justify-center min-h-[400px]">
-                <p className="text-gray-500">Aucun résultat trouvé.</p>
-              </div>
-            )}
-          </div>
-        </ResizablePanel>
-  
-        <ResizableHandle />
-        <ResizablePanel defaultSize={15} className="p-5">
-          <h2 className="text-xl font-semibold">Aperçu</h2>
-  
-          {/* Options de filtre */}
-          <div className="w-full max-w-2xl space-y-4 mt-6">
-            <h2 className="text-xl font-semibold text-green-600 mb-4">Options de filtre</h2>
-  
-            {/* Filtre de classification */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Filtrer par classification :</label>
-              <select
-                value={classificationFilter}
-                onChange={(e) => setClassificationFilter(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500"
-              >
-                <option value="">Tous</option>
-                {uniqueClassifications.map((classification) => (
-                  <option key={classification} value={classification}>
-                    {classification}
-                  </option>
-                ))}
-              </select>
-            </div>
-  
-            {/* Filtre de date */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Filtrer par date :</label>
-              <input
-                type="date"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500"
-              />
-            </div>
-  
-            {/* Options de tri */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Trier par :</label>
-              <select
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500"
-              >
-                <option value="">Aucun tri</option>
-                <option value="name">Nom</option>
-                <option value="date">Date</option>
-              </select>
-            </div>
-  
-            {/* Options de groupement */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Grouper par :</label>
-              <select
-                value={groupOption}
-                onChange={(e) => setGroupOption(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500"
-              >
-                <option value="">Aucun groupement</option>
-                <option value="classification">Classification</option>
-                <option value="date">Date</option>
-              </select>
-            </div>
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
     </div>
-  </div>
-  
+
   );
 }

@@ -71,9 +71,14 @@ export default function HomePage() {
         {/* Dynamic Hero Section */}
         <section className="relative overflow-hidden py-20 lg:py-32">
           {/* Background Decorative Elements */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10">
-            <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-            <div className="absolute bottom-[-10%] right-[20%] w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px]" />
+          <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full">
+              <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
+              <div className="absolute bottom-[-10%] right-[20%] w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px]" />
+            </div>
+            {/* Added Doodles-like subtle organic shape */}
+            <div className="absolute top-1/4 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl opacity-30 -translate-x-1/2" />
+            <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl opacity-30 translate-x-1/2" />
           </div>
 
           <div className="container mx-auto px-4 text-center">

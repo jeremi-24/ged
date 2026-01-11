@@ -9,7 +9,7 @@ import ReactLoading from 'react-loading';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { Trash2, UserCog, Mail, Shield, User as UserIcon, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Badge } from '@/components/ui/Badge';
+import { Badge } from '@/components/ui/badge';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';

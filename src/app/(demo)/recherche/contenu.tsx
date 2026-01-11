@@ -6,16 +6,23 @@ import { useSearch } from '@/lib/services/Search';
 import Link from 'next/link';
 import { Timestamp } from 'firebase/firestore';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { Search, Mic, Share2, Trash2, Download, X } from "lucide-react";
 import './style.css';
-import Image from 'next/image';
-import { DialogTitle } from '@/components/ui/dialog';
 import { LogEntry } from '@/types/Logs';
 import { logEvent } from '@/lib/services/logEvent';
 import { getDeviceInfo } from '@/lib/utils/deviceInfo';
 import { getAuth } from 'firebase/auth';
 import UserInfoDialog from '@/components/ux/UserInfoDialog';
 import { useToast } from '@/hooks/use-toast';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Calendar as CalendarIcon, SlidersHorizontal, ArrowRight } from "lucide-react";
 
 export default function Contenu() {
   const { toast } = useToast();
@@ -168,186 +175,284 @@ export default function Contenu() {
 
 
 
+  const [isListening, setIsListening] = useState(false);
+
+  const formatDate = (date: any) => {
+    if (!date) return "N/A";
+    try {
+      if (date && typeof date === 'object' && 'seconds' in date) {
+        return new Date(date.seconds * 1000).toLocaleDateString();
+      }
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return "N/A";
+      return d.toLocaleDateString();
+    } catch (e) {
+      return "N/A";
+    }
+  };
+
+  const getFileIcon = (type: string) => {
+    const isImage = type.includes('image');
+    const isPDF = type.includes('pdf');
+    return (
+      <div className={cn(
+        "w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner border border-black/5 dark:border-white/5",
+        isPDF ? "bg-orange-500/10 text-orange-500" :
+          isImage ? "bg-blue-500/10 text-blue-500" :
+            "bg-zinc-100 dark:bg-zinc-800 text-zinc-400"
+      )}>
+        {isPDF ? <span className="text-xl font-bold">PDF</span> :
+          isImage ? <span className="text-xl font-bold">IMG</span> :
+            <span className="text-xl font-bold">DOC</span>}
+      </div>
+    );
+  };
+
+  const getClassificationBadge = (classification: string) => {
+    const c = classification?.toLowerCase() || "";
+    const config: Record<string, { label: string, color: string }> = {
+      'facture': { label: 'Facture', color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200/50 dark:border-indigo-800/50' },
+      'contrat': { label: 'Contrat', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-800/50' },
+      'identite': { label: 'Identité', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200/50 dark:border-amber-800/50' },
+    };
+    const matched = Object.entries(config).find(([key]) => c.includes(key));
+    if (matched) return <Badge className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tight shadow-none border", matched[1].color)}>{matched[1].label}</Badge>;
+    return <Badge variant="outline" className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tight text-zinc-500 border-zinc-200/50 dark:border-zinc-800/50 shadow-none">{classification || "Inconnu"}</Badge>;
+  };
+
   return (
-    <div className="rounded-lg border-none mt-3 shadow-lg">
-      <div className="p-0">
-        <UserInfoDialog />
-        <ResizablePanelGroup direction="horizontal" className="w-full rounded-lg border">
-          <ResizablePanel defaultSize={85} className="p-5">
+    <div className="mt-6 h-[calc(100vh-120px)] flex flex-col bg-white/40 dark:bg-zinc-950/40 backdrop-blur-xl rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-2xl">
+      <UserInfoDialog />
+      <ResizablePanelGroup direction="horizontal" className="h-full">
+        <ResizablePanel defaultSize={75} minSize={60} className="flex flex-col">
+          {/* Header Search Area */}
+          <div className="p-8 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/30">
+            <div className="max-w-3xl mx-auto w-full space-y-6">
+              <div className="text-center space-y-2">
+                <h1 className="text-4xl font-black italic tracking-tighter text-zinc-900 dark:text-zinc-100">Recherche Intelligente</h1>
+                <p className="text-zinc-500 font-medium">Localisez instantanément vos documents auto-classés.</p>
+              </div>
 
-            <div className="flex flex-col items-center space-y-4">
-              <div className="w-full max-w-xl rounded-lg relative">
-                <input
-                  id='search'
-                  type="text"
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  placeholder="Recherchez des documents..."
-                  className="w-full p-3 pl-12 pr-12 border border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-                <div className="absolute inset-y-0 -left-2 flex items-center">
-                  <Image
-                    src="/star.png"
-                    alt="Description de l'image"
-                    width={60}
-                    height={60}
-                    className=""
+              <div className="flex flex-col items-center space-y-4 w-full px-4">
+                <div className="w-full max-w-2xl relative group">
+                  <input
+                    id='search'
+                    type="text"
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    placeholder="Recherchez des documents par nom ou contenu..."
+                    className="w-full p-4 pl-6 pr-32 border border-slate-200 rounded-2xl shadow-sm search-input-pro bg-white/50 backdrop-blur-sm"
                   />
-                </div>
-                <div className="absolute inset-y-0 right-3 flex items-center cursor-pointer">
-                  <div className="group relative p-2 rounded-full">
-                    <div onClick={handleVoiceSearch} className="flex items-center">
-                      <Mic className="hover:text-blue-500 text-gray-400 mr-1" /> {/* Icône Mic */}
-
-                    </div>
-                    <div className="bg-zinc-800 p-2 rounded-md group-hover:flex hidden absolute top-1/2 -translate-y-1/2 -left-2 -translate-x-full">
-                      <span className="text-zinc-400 whitespace-nowrap">Cliquer pour une recherche vocale</span>
-                      <div className="bg-inherit rotate-45 p-1 absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2"></div>
-                    </div>
+                  <div className="absolute inset-y-0 right-2 flex items-center space-x-2">
+                    <button
+                      onClick={handleVoiceSearch}
+                      className="btn-professional btn-ghost-pro text-blue-600 hover:bg-blue-50"
+                    >
+                      Vocal
+                    </button>
                   </div>
-
                 </div>
               </div>
             </div>
+          </div>
 
-            <h2 className="text-xl font-semibold text-gray-800 mb-4 mt-6">Résultats de Recherche</h2>
-            <div className="overflow-auto min-h-[300px] max-h-[500px]">
+          {/* Results Area */}
+          <div className="flex-1 overflow-auto p-8">
+            <AnimatePresence mode="wait">
+              {Object.keys(groupedResults).length > 0 && filteredResults.length > 0 ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="space-y-12"
+                >
+                  {Object.entries(groupedResults).map(([group, docs]) => (
+                    <div key={group} className="space-y-6">
+                      <div className="flex items-center gap-4">
+                        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-800 to-transparent" />
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-4 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800">
+                          {group} ({docs.length})
+                        </h3>
+                        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-zinc-200 dark:via-zinc-800 to-transparent" />
+                      </div>
 
-              {Object.keys(groupedResults).map((group) => (
-                <div key={group}>
-                  <h3 className="text-lg font-bold">{group}</h3>
-                  <ul className="grid grid-cols-1 gap-y-10 gap-x-5 md:grid-cols-2 p-5 lg:grid-cols-3">
-                    {groupedResults[group].map((doc) => (
-                      <li key={doc.id} className="relative border border-gray-200 rounded-xl card hover:shadow-md transition duration-150">
-                        <Link href={`/discussion?id=${doc.url}&text=${encodeURIComponent(doc.text)}&texte=${encodeURIComponent(doc.url)}&name=${encodeURIComponent(doc.name)}`}>
-                          <div className="flex-grow p-2">
-                            <iframe
-                              src={`https://docs.google.com/gview?url=${encodeURIComponent(doc.url)}&embedded=true`}
-                              width="100%"
-                              height="100%"
-                              className="border rounded-xl"
-                              style={{ minHeight: '200px' }}
-                            />
-                          </div>
-                          <div className=' mb-3 ml-3'>
-                            <h3 className="text-lg font-semibold text-blue-600">{doc.name}</h3>
-                            <p className="text-gray-600"> {doc.classification}</p>
-                            <p className={`text-gray-600 ${doc.isArchived ? 'text-green-600' : 'text-red-600'}`}>
-                              {doc.isArchived !== undefined
-                                ? (doc.isArchived ? 'archivé' : 'non archivé')
-                                : 'Non spécifié'}
-                            </p>
+                      <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 p-4">
+                        {docs.map((doc) => (
+                          <li key={doc.id} className="relative card-pro group/card animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <Link href={`/discussion?id=${doc.url}&text=${encodeURIComponent(doc.text)}&texte=${encodeURIComponent(doc.url)}&name=${encodeURIComponent(doc.name)}`} className="block h-full">
+                              <div className="p-3 bg-slate-50/50">
+                                <div className="aspect-[4/3] w-full relative overflow-hidden rounded-xl border border-slate-200 bg-white">
+                                  <iframe
+                                    src={`https://docs.google.com/gview?url=${encodeURIComponent(doc.url)}&embedded=true`}
+                                    width="100%"
+                                    height="100%"
+                                    className="w-full h-full grayscale-[0.5] group-hover/card:grayscale-0 transition-all duration-500"
+                                  />
+                                </div>
+                              </div>
+                              <div className='p-5 space-y-2'>
+                                <h3 className="text-lg font-bold text-slate-800 line-clamp-1 group-hover/card:text-blue-600 transition-colors uppercase tracking-tight">{doc.name}</h3>
+                                <div className="flex items-center gap-2">
+                                  <span className="badge-pro bg-blue-50 text-blue-600 uppercase">
+                                    {doc.classification}
+                                  </span>
+                                  <span className={`badge-pro ${doc.isArchived ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}`}>
+                                    {doc.isArchived ? 'Archivé' : 'Actif'}
+                                  </span>
+                                </div>
+                                <p className="text-slate-400 text-xs font-medium uppercase tracking-widest">
+                                  {new Date(doc.createdAt).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </Link>
 
-                            <p className="text-gray-500 text-sm"> {new Date(doc.createdAt).toLocaleDateString()}</p>
-                          </div>
-
-                        </Link>
-
-
-                        {/* Cercle avec icône de téléchargement */}
-                        <button
-                          onClick={() => downloadFile(doc.url, doc.name)}
-                          className="absolute bottom-2 right-2 bg-blue-600 text-white rounded-full p-3 shadow-lg hover:bg-blue-700 transition duration-150"
-                        >
-                          <Download className="w-5 h-5" />
-                        </button>
-
-                        {/* Affichage conditionnel du Dialog */}
-                        {dialogOpen && (
-                          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-25">
-                            <div className="bg-neutral-900 rounded-lg p-6">
-                              <h2 className="text-lg font-bold mb-2">{dialogTitle}</h2>
-                              <p>{dialogDescription}</p>
-                              <button
-                                onClick={() => setDialogOpen(false)}
-                                className="mt-4 bg-blue-600 rounded-xl text-white  p-2 hover:bg-blue-700 transition"
-                              >
-                                <X className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </div>)}
-                      </li>
-
-                    ))}
-                  </ul>
-                </div>
-              ))}
-              {filteredResults.length === 0 && (
-                <div className="flex items-center justify-center min-h-[400px]">
-                  <p className="text-gray-500">Aucun résultat trouvé.</p>
+                            <button
+                              onClick={() => downloadFile(doc.url, doc.name)}
+                              className="absolute bottom-4 right-4 btn-professional btn-primary-pro opacity-0 group-hover/card:opacity-100 transition-all duration-300 translate-y-2 group-hover/card:translate-y-0"
+                            >
+                              Télécharger
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </motion.div>
+              ) : (
+                <div className="h-full min-h-[400px] flex flex-col items-center justify-center space-y-4 text-zinc-400">
+                  <div className="w-20 h-20 rounded-3xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
+                    <span className="text-3xl font-bold opacity-20">?</span>
+                  </div>
+                  <p className="font-bold italic text-sm">Aucun résultat trouvé dans la bibliothèque</p>
                 </div>
               )}
+            </AnimatePresence>
+          </div>
+        </ResizablePanel>
+
+        <ResizableHandle className="bg-transparent hover:bg-blue-500/20 transition-colors" />
+
+        <ResizablePanel defaultSize={25} minSize={20} className="bg-zinc-50/50 dark:bg-zinc-900/50 backdrop-blur-md">
+          <div className="p-8 space-y-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                <SlidersHorizontal className="w-4 h-4" />
+              </div>
+              <h2 className="text-sm font-black uppercase tracking-widest text-zinc-900 dark:text-zinc-100">Filtres Avancés</h2>
             </div>
-          </ResizablePanel>
 
-          <ResizableHandle />
-          <ResizablePanel defaultSize={25} className="p-5">
-            <h2 className="text-xl font-semibold">Aperçu</h2>
+            <div className="space-y-6">
+              {/* Classification */}
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Classification</label>
+                <Select value={classificationFilter} onValueChange={setClassificationFilter}>
+                  <SelectTrigger className="w-full h-11 rounded-xl bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-sm font-medium">
+                    <SelectValue placeholder="Toutes les catégories" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-zinc-200 dark:border-zinc-800">
+                    <SelectItem value="none">Toutes les catégories</SelectItem>
+                    {uniqueClassifications.map((c) => (
+                      <SelectItem key={c} value={c} className="rounded-lg capitalize">{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Options de filtre */}
-            <div className="w-full max-w-2xl space-y-4 mt-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Options de filtre</h2>
+              {/* Date */}
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Période</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full h-11 rounded-xl justify-start text-left font-medium bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-sm",
+                        !dateFilter && "text-zinc-500"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
+                      {dateFilter ? format(new Date(dateFilter), "PPP", { locale: fr }) : "Sélectionner une date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 rounded-2xl border-none shadow-2xl" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateFilter ? new Date(dateFilter) : undefined}
+                      onSelect={(date) => setDateFilter(date ? date.toISOString().substring(0, 10) : "")}
+                      initialFocus
+                      className="rounded-2xl"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
 
-              {/* Filtre de classification */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Filtrer par classification :</label>
-                <select
-                  value={classificationFilter}
-                  onChange={(e) => setClassificationFilter(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500"
-                >
-                  <option value="">Tous</option>
-                  {uniqueClassifications.map((classification) => (
-                    <option key={classification} value={classification}>
-                      {classification}
-                    </option>
+              {/* Sorting */}
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Trier par</label>
+                <div className="flex flex-col gap-2">
+                  {[
+                    { id: 'none', label: 'Défaut' },
+                    { id: 'name', label: 'Nom du fichier' },
+                    { id: 'date', label: 'Date d\'ajout' }
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setSortOption(opt.id === 'none' ? '' : opt.id)}
+                      className={cn(
+                        "flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all border",
+                        (opt.id === 'none' ? sortOption === '' : sortOption === opt.id)
+                          ? "bg-blue-500/10 text-blue-600 border-blue-500/20 shadow-sm"
+                          : "bg-white dark:bg-zinc-950 text-zinc-500 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+                      )}
+                    >
+                      {opt.label}
+                      {(opt.id === 'none' ? sortOption === '' : sortOption === opt.id) && <ArrowRight className="w-3 h-3" />}
+                    </button>
                   ))}
-                </select>
+                </div>
               </div>
 
-              {/* Filtre de date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Filtrer par date :</label>
-                <input
-                  type="date"
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500"
-                />
-              </div>
-
-              {/* Options de tri */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Trier par :</label>
-                <select
-                  value={sortOption}
-                  onChange={(e) => setSortOption(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500"
-                >
-                  <option value="">Aucun tri</option>
-                  <option value="name">Nom</option>
-                  <option value="date">Date</option>
-                </select>
-              </div>
-
-              {/* Options de groupement */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Grouper par :</label>
-                <select
-                  value={groupOption}
-                  onChange={(e) => setGroupOption(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500"
-                >
-                  <option value="">Aucun groupement</option>
-                  <option value="classification">Classification</option>
-                  <option value="date">Date</option>
-                </select>
+              {/* Grouping */}
+              <div className="space-y-3 pt-6 border-t border-zinc-200 dark:border-zinc-800">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Grouper par</label>
+                <div className="flex gap-2">
+                  {[
+                    { id: '', label: 'Aucun' },
+                    { id: 'classification', label: 'Catégorie' },
+                    { id: 'date', label: 'Date' }
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setGroupOption(opt.id)}
+                      className={cn(
+                        "flex-1 px-2 py-2 rounded-lg text-[10px] font-black uppercase tracking-tighter transition-all border",
+                        groupOption === opt.id
+                          ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 border-transparent shadow-md transform scale-105"
+                          : "bg-white dark:bg-zinc-950 text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                      )}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      </div>
-    </div>
 
+            <Button
+              variant="ghost"
+              className="w-full rounded-xl text-zinc-400 hover:text-red-500 hover:bg-red-500/5 text-[10px] font-bold uppercase tracking-widest"
+              onClick={() => {
+                setClassificationFilter('');
+                setDateFilter('');
+                setSortOption('');
+                setGroupOption('');
+                setSearchText('');
+              }}
+            >
+              Réinitialiser
+            </Button>
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 }

@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Bot, User, FileText, Maximize2, Minimize2, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/Badge';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 interface Message {

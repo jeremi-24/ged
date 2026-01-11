@@ -8,7 +8,7 @@ import UserInfoDialog from "@/components/ux/UserInfoDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileClock, History, Archive, CheckCircle2, AlertCircle, Calendar, Trash2, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Badge } from '@/components/ui/Badge';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 

@@ -62,7 +62,7 @@ import { fetchDocuments } from "@/lib/services/CRUD/fetchDocument";
 import DropdownMenuplus from "@/components/ui/DropdownMenu";
 
 import { cn } from "@/lib/utils";
-import { Badge } from "../ui/Badge";
+import { Badge } from "../ui/badge";
 
 interface DataTableDemoProps {
   onDocumentClick: (document: DocumentData) => void;
