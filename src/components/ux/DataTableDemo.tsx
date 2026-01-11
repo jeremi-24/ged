@@ -60,8 +60,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DocumentData } from "@/types/types";
 import { fetchDocuments } from "@/lib/services/CRUD/fetchDocument";
 import DropdownMenuplus from "@/components/ui/DropdownMenu";
-import { Badge } from "@/components/ui/badge";
+
 import { cn } from "@/lib/utils";
+import { Badge } from "../ui/Badge";
 
 interface DataTableDemoProps {
   onDocumentClick: (document: DocumentData) => void;
