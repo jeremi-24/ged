@@ -135,7 +135,15 @@
     @apply bg-card/60 backdrop-blur-lg border border-white/10 dark:border-white/5;
   }
 
+  @layer components {
   .premium-card {
-    @apply border-none shadow-[0_8px_30px_rgba(0, 0, 0, 0.04)] dark:shadow-[0_8px_30px_rgba(0, 0, 0, 0.1)] hover:shadow-[0_8px_30px_rgba(0, 0, 0, 0.08)] transition-all duration-300;
+    @apply border-none 
+      shadow-[0_8px_30px_rgba(0,0,0,0.04)] 
+      dark:shadow-[0_8px_30px_rgba(0,0,0,0.1)] 
+      hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] 
+      transition-all 
+      duration-300;
   }
+}
+
 }

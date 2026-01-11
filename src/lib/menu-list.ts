@@ -35,64 +35,64 @@ export function getMenuList(pathname: string): Group[] {
       menus: [
         {
           href: "/dashboard",
-          label: "Dashboard",
+          label: "dashboard",
           icon: LayoutGrid,
           submenus: []
         }
       ]
     },
     {
-      groupLabel: "Contenu",
+      groupLabel: "sidebar.content",
       menus: [
         {
           href: "",
-          label: "Documents",
+          label: "sidebar.documents",
           icon: SquarePen,
           submenus: [
             {
               href: "/documents",
-              label: "Mes Documents"
+              label: "sidebar.my_documents"
             },
             {
               href: "/documents/nouveau_document",
-              label: "Nouveau document"
+              label: "sidebar.new_document"
             }
           ]
         },
         {
           href: "/recherche",
-          label: "Recherche",
+          label: "sidebar.search",
           icon: Search,
         },
         {
           href: "/logs",
-          label: "Rapports",
+          label: "sidebar.reports",
           icon: Flag
         }
       ]
     },
     {
-      groupLabel: "Réglages",
+      groupLabel: "sidebar.settings",
       menus: [
         {
           href: "/Utilisateurs",
-          label: "Utilisateurs",
+          label: "sidebar.users",
           icon: Bell
         },
         {
           href: "/account",
-          label: "Compte",
+          label: "sidebar.account",
           icon: Settings
         }
       ]
     },
     {
-      groupLabel: "Outils IA",
+      groupLabel: "sidebar.ai_tools",
       menus: [
         {
           href: "/discussion",
-          label: "Discussion",
-          icon: MessageSquareMore // Vous pouvez choisir une autre icône si vous le souhaitez
+          label: "sidebar.discussion",
+          icon: MessageSquareMore
         }
       ]
     }

@@ -15,6 +15,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { useLanguage } from '@/components/providers/language-provider';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Languages } from 'lucide-react';
 
 
 interface User {
@@ -35,6 +44,7 @@ const Contenu = () => {
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const { locale, setLocale, t } = useLanguage();
 
   const loadUserData = useCallback(async (uid: string) => {
     setLoading(true);
@@ -118,10 +128,10 @@ const Contenu = () => {
     <div className="space-y-8 mt-8">
       <div className="space-y-1">
         <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text text-transparent">
-          Paramètres du Compte
+          {t('account.settings')}
         </h2>
         <p className="text-zinc-500 dark:text-zinc-400">
-          Gérez vos informations personnelles et vos préférences de sécurité.
+          {t('account.description')}
         </p>
       </div>
 
@@ -172,7 +182,7 @@ const Contenu = () => {
               <div className="space-y-4">
                 <div className="flex items-center gap-3 text-zinc-900 dark:text-zinc-100 font-bold">
                   <LucideUser className="w-5 h-5 text-blue-500" />
-                  Détails Personnels
+                  {t('account.personal_details')}
                 </div>
                 <div className="space-y-3 bg-zinc-50/50 dark:bg-zinc-900/50 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800">
                   <div className="flex justify-between">
@@ -193,7 +203,7 @@ const Contenu = () => {
               <div className="space-y-4">
                 <div className="flex items-center gap-3 text-zinc-900 dark:text-zinc-100 font-bold">
                   <Settings className="w-5 h-5 text-blue-500" />
-                  Compte & Statut
+                  {t('account.status')}
                 </div>
                 <div className="space-y-3 bg-zinc-50/50 dark:bg-zinc-900/50 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800">
                   <div className="flex justify-between">
@@ -219,7 +229,7 @@ const Contenu = () => {
             <CardContent className="p-8 space-y-6">
               <div className="flex items-center gap-3 text-zinc-900 dark:text-zinc-100 font-bold mb-2">
                 <Lock className="w-5 h-5 text-blue-500" />
-                Sécurité
+                {t('account.security')}
               </div>
 
               <div className="space-y-4">
@@ -252,6 +262,38 @@ const Contenu = () => {
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : "Mettre à jour"}
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-3xl border-zinc-100 dark:border-zinc-800 shadow-xl bg-white/50 dark:bg-zinc-950/50 backdrop-blur-xl overflow-hidden">
+            <CardContent className="p-8 space-y-6">
+              <div className="flex items-center gap-3 text-zinc-900 dark:text-zinc-100 font-bold mb-2">
+                <Languages className="w-5 h-5 text-blue-500" />
+                {t('preferences.title')}
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+                    {t('preferences.language')}
+                  </Label>
+                  <Select
+                    value={locale}
+                    onValueChange={(val: "fr" | "en") => setLocale(val)}
+                  >
+                    <SelectTrigger className="rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-blue-500">
+                      <SelectValue placeholder="Choisir une langue" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-zinc-400 italic">
+                    {t('preferences.language_desc')}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

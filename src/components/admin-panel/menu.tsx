@@ -19,6 +19,7 @@ import { auth } from "@/firebase/config";
 import { logEvent } from "@/lib/services/logEvent";
 import { LogEntry } from "@/types/Logs";
 import { getDeviceInfo } from "@/lib/utils/deviceInfo";
+import { useLanguage } from "@/components/providers/language-provider";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -27,14 +28,15 @@ interface MenuProps {
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
+  const { t } = useLanguage();
 
-  
+
   const handleLogout = async () => {
     try {
       // Récupérer l'ID de l'utilisateur actuellement connecté avant la déconnexion
       const user = auth.currentUser;
       const userId = user ? user.uid : "utilisateur_inconnu"; // Gestion si l'utilisateur n'est pas trouvé
-  
+
       // Enregistrement du log avant la déconnexion
       const logEntry: LogEntry = {
         event: "deconnexion_utilisateur", // Événement pour déconnexion
@@ -42,19 +44,19 @@ export function Menu({ isOpen }: MenuProps) {
         createdAt: new Date(), // Date et heure de l'événement
         details: `L'utilisateur ${user ? user.email : "inconnu"} s'est déconnecté.`,
         documentId: "",
-        device:  `Depuis ${deviceDetails}  `,
+        device: `Depuis ${deviceDetails}  `,
       };
-      await logEvent(logEntry,userId); // Enregistrement du log
-  
+      await logEvent(logEntry, userId); // Enregistrement du log
+
       // Procéder à la déconnexion
       await logout();
-  
+
       // Rediriger l'utilisateur vers la page de connexion après déconnexion
       window.location.href = "/connexion";
     } catch (error: any) {
       console.error("Erreur lors de la déconnexion :", error);
       alert(error.message);
-  
+
       // Enregistrement du log en cas d'erreur lors de la déconnexion
       const errorLog: LogEntry = {
         event: "deconnexion_echec", // Événement pour échec de déconnexion
@@ -62,12 +64,12 @@ export function Menu({ isOpen }: MenuProps) {
         createdAt: new Date(), // Date et heure de l'événement
         details: `Échec de la déconnexion pour l'utilisateur : ${error.message}`,
         documentId: "",
-        device:  `Depuis ${deviceDetails}  `,
+        device: `Depuis ${deviceDetails}  `,
       };
-      await logEvent(errorLog,""); // Enregistrement du log pour l'erreur de déconnexion
+      await logEvent(errorLog, ""); // Enregistrement du log pour l'erreur de déconnexion
     }
   };
-    const deviceDetails = getDeviceInfo();
+  const deviceDetails = getDeviceInfo();
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -77,7 +79,7 @@ export function Menu({ isOpen }: MenuProps) {
             <li className={cn("w-full", groupLabel ? "pt-5" : "")} key={index}>
               {(isOpen && groupLabel) || isOpen === undefined ? (
                 <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate">
-                  {groupLabel}
+                  {t(groupLabel)}
                 </p>
               ) : !isOpen && isOpen !== undefined && groupLabel ? (
                 <TooltipProvider>
@@ -88,7 +90,7 @@ export function Menu({ isOpen }: MenuProps) {
                       </div>
                     </TooltipTrigger>
                     <TooltipContent side="right">
-                      <p>{groupLabel}</p>
+                      <p>{t(groupLabel)}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -106,7 +108,7 @@ export function Menu({ isOpen }: MenuProps) {
                               variant={
                                 (active === undefined &&
                                   pathname.startsWith(href)) ||
-                                active
+                                  active
                                   ? "secondary"
                                   : "ghost"
                               }
@@ -127,14 +129,14 @@ export function Menu({ isOpen }: MenuProps) {
                                       : "translate-x-0 opacity-100"
                                   )}
                                 >
-                                  {label}
+                                  {t(label)}
                                 </p>
                               </Link>
                             </Button>
                           </TooltipTrigger>
                           {isOpen === false && (
                             <TooltipContent side="right">
-                              {label}
+                              {t(label)}
                             </TooltipContent>
                           )}
                         </Tooltip>
@@ -176,12 +178,12 @@ export function Menu({ isOpen }: MenuProps) {
                         isOpen === false ? "opacity-0 hidden" : "opacity-100"
                       )}
                     >
-                      Se déconnecter
+                      {t('sidebar.logout')}
                     </p>
                   </Button>
                 </TooltipTrigger>
                 {isOpen === false && (
-                  <TooltipContent side="right">Se déconnecter</TooltipContent>
+                  <TooltipContent side="right">{t('sidebar.logout')}</TooltipContent>
                 )}
               </Tooltip>
             </TooltipProvider>

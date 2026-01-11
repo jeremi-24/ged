@@ -27,6 +27,7 @@ import {
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import { usePathname } from "next/navigation";
+import { useLanguage } from "@/components/providers/language-provider";
 
 type Submenu = {
   href: string;
@@ -50,6 +51,7 @@ export function CollapseMenuButton({
   isOpen
 }: CollapseMenuButtonProps) {
   const pathname = usePathname();
+  const { t } = useLanguage();
   const isSubmenuActive = submenus.some((submenu) =>
     submenu.active === undefined ? submenu.href === pathname : submenu.active
   );
@@ -82,7 +84,7 @@ export function CollapseMenuButton({
                     : "-translate-x-96 opacity-0"
                 )}
               >
-                {label}
+                {t(label)}
               </p>
             </div>
             <div
@@ -125,7 +127,7 @@ export function CollapseMenuButton({
                     : "-translate-x-96 opacity-0"
                 )}
               >
-                {label}
+                {t(label)}
               </p>
             </Link>
           </Button>
@@ -153,7 +155,7 @@ export function CollapseMenuButton({
                         isOpen === false ? "opacity-0" : "opacity-100"
                       )}
                     >
-                      {label}
+                      {t(label)}
                     </p>
                   </div>
                 </div>
@@ -161,25 +163,24 @@ export function CollapseMenuButton({
             </DropdownMenuTrigger>
           </TooltipTrigger>
           <TooltipContent side="right" align="start" alignOffset={2}>
-            {label}
+            {t(label)}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
       <DropdownMenuContent side="right" sideOffset={25} align="start">
         <DropdownMenuLabel className="max-w-[190px] truncate">
-          {label}
+          {t(label)}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {submenus.map(({ href, label, active }, index) => (
           <DropdownMenuItem key={index} asChild>
             <Link
-              className={`cursor-pointer ${
-                ((active === undefined && pathname === href) || active) &&
+              className={`cursor-pointer ${((active === undefined && pathname === href) || active) &&
                 "bg-secondary"
-              }`}
+                }`}
               href={href}
             >
-              <p className="max-w-[180px] truncate">{label}</p>
+              <p className="max-w-[180px] truncate">{t(label)}</p>
             </Link>
           </DropdownMenuItem>
         ))}
