@@ -12,12 +12,13 @@ import DeleteDocuments from "@/lib/services/CRUD/DeleteDocuments";
 import UserInfoDialog from "@/components/ux/UserInfoDialog";
 import PDFPreview from "@/components/ux/PDFPreview";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Info, X } from "lucide-react";
+import { FileText, Info, X, LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Contenu() {
     const [selectedDocument, setSelectedDocument] = useState<DocumentData | null>(null);
     const [selectedIds, setSelectedIds] = useState<string>("");
+    const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
     const loadDocuments = async () => {
         // This is handled inside DataTableDemo but can be triggered from here if needed
@@ -36,8 +37,29 @@ export function Contenu() {
                     className="w-full h-full rounded-3xl overflow-hidden"
                 >
                     <ResizablePanel defaultSize={70} minSize={40} className="flex flex-col bg-white/40 dark:bg-zinc-950/40 backdrop-blur-xl border-r border-zinc-200 dark:border-zinc-800">
+                        <div className="p-6 border-b border-zinc-200 dark:border-zinc-800 flex justify-end gap-2 bg-zinc-50/30 dark:bg-zinc-900/30">
+                            <Button
+                                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className="rounded-xl gap-2 h-9 px-4 font-bold"
+                                onClick={() => setViewMode('list')}
+                            >
+                                <motion.div animate={{ scale: viewMode === 'list' ? 1.1 : 1 }}><List className="w-4 h-4" /></motion.div>
+                                Liste
+                            </Button>
+                            <Button
+                                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className="rounded-xl gap-2 h-9 px-4 font-bold"
+                                onClick={() => setViewMode('grid')}
+                            >
+                                <motion.div animate={{ scale: viewMode === 'grid' ? 1.1 : 1 }}><LayoutGrid className="w-4 h-4" /></motion.div>
+                                Grille
+                            </Button>
+                        </div>
                         <div className="p-6 flex-1 overflow-auto">
                             <DataTableDemo
+                                viewMode={viewMode}
                                 onDocumentClick={handleDocumentClick}
                                 setSelectedIds={setSelectedIds}
                                 onRefresh={loadDocuments}
