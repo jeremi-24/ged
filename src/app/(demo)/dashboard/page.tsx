@@ -25,7 +25,7 @@ import { Contenu } from "./contenu";
 import DocumentChart from "@/components/ux/DocumentChart";
 import DropdownMenuplus from "@/components/ui/DropdownMenu";
 import { FilePlus2, Search, Settings, TrashIcon } from "lucide-react";
-import { useState, useCallback } from "react"; // Ajout de useCallback
+import { useState, useCallback } from "react"; 
 import { DocumentData } from "@/types/types";
 import { StorageCard } from "@/components/ux/StorageCard";
 import { RecentActivity } from "@/components/ux/RecentActivity";
@@ -36,7 +36,6 @@ export default function DashboardPage() {
   const [documents, setDocuments] = useState<DocumentData[]>([]);
   const [storageUsed, setStorageUsed] = useState(0);
 
-  // CORRECTION : Utilisation de useCallback pour éviter de recréer la fonction à chaque rendu
   const handleDataLoaded = useCallback((docs: DocumentData[]) => {
     setDocuments(docs);
     const size = docs.reduce((acc, doc) => acc + (doc.size || 0), 0);
@@ -98,7 +97,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="space-y-6">
-        {/* On passe la fonction stable ici */}
+        {}
         <Contenu onDataLoaded={handleDataLoaded} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

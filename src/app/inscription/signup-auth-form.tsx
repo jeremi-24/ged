@@ -25,7 +25,7 @@ type UserFormValue = z.infer<typeof formSchema>;
 
 export default function UserAuthForm() {
   const [loading, setLoading] = React.useState(false);
-  const [step, setStep] = React.useState(1); // Étape initiale du formulaire
+  const [step, setStep] = React.useState(1); 
   const [firebase_uid, setFirebaseUid] = React.useState<string | null>(null);
   const [organisations_id, setOrganisationsId] = React.useState<number | null>(null);
   const [country, setCountry] = React.useState<string>('');
@@ -103,7 +103,7 @@ export default function UserAuthForm() {
 
       if (organisationId) {
         setOrganisationsId(organisationId);
-        setStep(2); // Passe à l'étape suivante
+        setStep(2); 
       }
     } catch (error) {
       setMessage('Une erreur est survenue, veuillez réessayer.');

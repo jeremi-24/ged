@@ -8,16 +8,14 @@ interface DocumentWithDueDate extends DocumentData {
   isArchived: boolean;
 }
 
-// Règles d'archivage basées sur la classification des documents (en années)
 const archiveRules: { [classification: string]: number } = {
   "Facture": 5,
   "Contrat": 1,
   "Rapport": 3,
   "Reçu": 2,
-  // Ajoutez les autres classifications et règles ici
+  
 };
 
-// Fonction pour récupérer les documents dont l'échéance d'archivage est dans 1 mois
 export const fetchDocumentsWithOneMonthTillArchival = async (userId: string): Promise<{ documents: DocumentWithDueDate[]; total: number }> => {
   const documentsToArchive: DocumentWithDueDate[] = [];
   const currentDate = new Date();
@@ -36,24 +34,21 @@ export const fetchDocumentsWithOneMonthTillArchival = async (userId: string): Pr
           ? documentData.createdAt.toDate()
           : new Date(documentData.createdAt);
 
-        // Obtenir la règle d'archivage selon la classification
         const archiveThreshold = archiveRules[documentData.classification] || 5;
 
-        // Calculer la date d'échéance d'archivage
         const archiveDueDate = new Date(createdAtDate);
         archiveDueDate.setFullYear(archiveDueDate.getFullYear() + archiveThreshold);
 
-        // Vérifier si l'échéance est dans exactement 1 mois
         if (
           archiveDueDate.getFullYear() === oneMonthFromNow.getFullYear() &&
           archiveDueDate.getMonth() === oneMonthFromNow.getMonth() &&
           archiveDueDate.getDate() === currentDate.getDate()
         ) {
-          // Ajouter le document et ses détails dans le tableau de résultats
+          
           documentsToArchive.push({
-            ...documentData,  // Inclure tous les champs du document original
+            ...documentData,  
             documentId: docSnapshot.id,
-            isArchived: documentData.isArchived || false,  // État d'archivage actuel
+            isArchived: documentData.isArchived || false,  
           });
         }
       }

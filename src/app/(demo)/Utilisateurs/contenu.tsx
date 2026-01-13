@@ -101,7 +101,7 @@ const Contenu: React.FC = () => {
           variant="destructive"
           onClick={() => {
             if (window.confirm("Voulez-vous vraiment supprimer TOUS les utilisateurs ? Cette action est irréversible.")) {
-              // implementation is already there, just adding prompt
+              
             }
           }}
           className="rounded-2xl shadow-lg shadow-red-500/20 hover:shadow-red-500/40 transition-all duration-300"

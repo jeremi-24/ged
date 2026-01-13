@@ -1,6 +1,5 @@
 import { NextResponse } from "next/dist/server/web/spec-extension/response";
 
-
 export async function GET() {
   const client_id = process.env.GOOGLE_CLIENT_ID;
   const redirect_uri = process.env.GOOGLE_REDIRECT_URI;

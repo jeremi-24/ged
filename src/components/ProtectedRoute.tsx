@@ -23,7 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Spinner className="w-12 h-12" /> {/* Spinner for loading */}
+        <Spinner className="w-12 h-12" /> {}
       </div>
     );
   }

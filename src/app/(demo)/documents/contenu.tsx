@@ -21,7 +21,7 @@ export function Contenu() {
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
     const loadDocuments = async () => {
-        // This is handled inside DataTableDemo but can be triggered from here if needed
+        
     };
 
     const handleDocumentClick = (document: DocumentData) => {
@@ -79,7 +79,7 @@ export function Contenu() {
                                     exit={{ opacity: 0, x: 20 }}
                                     className="h-full flex flex-col bg-zinc-50/50 dark:bg-zinc-900/50 backdrop-blur-md"
                                 >
-                                    {/* Header Info */}
+                                    {}
                                     <div className="p-6 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-white/50 dark:bg-black/20">
                                         <div className="flex items-center gap-4">
                                             <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
@@ -100,14 +100,14 @@ export function Contenu() {
                                         </Button>
                                     </div>
 
-                                    {/* Preview Area */}
+                                    {}
                                     <div className="flex-1 overflow-auto p-4">
                                         <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm overflow-hidden h-full min-h-[400px]">
                                             <PDFPreview pdfUrl={selectedDocument.url} />
                                         </div>
                                     </div>
 
-                                    {/* Actions Footer */}
+                                    {}
                                     <div className="p-6 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-center bg-white/50 dark:bg-black/20">
                                         <DeleteDocuments
                                             selectedDocument={selectedDocument}

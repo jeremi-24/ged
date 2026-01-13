@@ -1,11 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 type ClassifyDocumentOptions = {
-  apiKey: string; // Clé API de Google Generative AI
-  model: string; // Nom du modèle Google Generative AI, par exemple "gemini-1.5-flash"
+  apiKey: string; 
+  model: string; 
 };
 
-// Fonction pour créer un délai en millisecondes
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const classifyDocument = async (text: string, options: ClassifyDocumentOptions, imageData?: string): Promise<{ classification: string, full_text: string, metadata: any }> => {
@@ -49,7 +48,7 @@ Texte extrait initial (peut être incomplet) : ${text}`;
 
     let result;
     if (imageData) {
-      // Nettoyage de la base64 si nécessaire
+      
       const base64Data = imageData.split(',')[1] || imageData;
       result = await model.generateContent([
         prompt,
@@ -68,7 +67,7 @@ Texte extrait initial (peut être incomplet) : ${text}`;
     return JSON.parse(responseText);
   } catch (error: any) {
     console.error('Erreur Gemini :', error);
-    // Fallback minimal en cas d'erreur de parsing ou d'API
+    
     return {
       classification: "Inconnu",
       full_text: text,

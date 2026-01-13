@@ -11,9 +11,7 @@ export default function PlaceholderContent() {
           <div className="flex flex-col relative">
            
             <div className="absolute -bottom-8 right-0">
-             
-             
-              
+
             </div>
           </div>
         </div>

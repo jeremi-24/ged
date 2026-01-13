@@ -1,4 +1,4 @@
-// src/firebase/auth.ts
+
 
 import { auth, googleProvider } from "./config";
 import { onAuthStateChanged } from "firebase/auth";
@@ -10,7 +10,6 @@ import {
   sendEmailVerification
 } from "firebase/auth";
 
-// Auth operations
 export const loginWithEmail = (email: string, password: string) => {
   return signInWithEmailAndPassword(auth, email, password);
 };

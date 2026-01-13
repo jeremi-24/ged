@@ -50,7 +50,6 @@ export default function UserAuthForm() {
             const userCredential = await loginWithEmail(data.email, data.password);
             const loggedUser = userCredential.user;
 
-            // Log attempt
             const logEntry: LogEntry = {
                 event: "tentative de connexion",
                 userId: loggedUser.uid,
@@ -62,7 +61,7 @@ export default function UserAuthForm() {
             await logEvent(logEntry, loggedUser.uid);
 
             if (loggedUser.emailVerified) {
-                // Log success
+                
                 const successLog: LogEntry = {
                     event: "Connexion de l'utilisateur",
                     userId: loggedUser.uid,
@@ -77,7 +76,6 @@ export default function UserAuthForm() {
                 setShowVerificationAlert(true);
                 await signOut(auth);
 
-                // Log unverified
                 const unverifiedLog: LogEntry = {
                     event: "email_non_verifié",
                     userId: loggedUser.uid,
@@ -91,7 +89,6 @@ export default function UserAuthForm() {
         } catch (err: any) {
             setError("Échec de la connexion. Veuillez vérifier vos identifiants.");
 
-            // Log error
             const errorLog: LogEntry = {
                 event: "Echec de la connexion",
                 userId: "",
@@ -112,7 +109,6 @@ export default function UserAuthForm() {
             const userCredential = await loginWithGoogle();
             const loggedUser = userCredential.user;
 
-            // Log attempt
             const logEntry: LogEntry = {
                 event: "connexion_google_tentative",
                 userId: loggedUser.uid,
@@ -125,7 +121,6 @@ export default function UserAuthForm() {
 
             router.push("/dashboard");
 
-            // Log success
             const successLog: LogEntry = {
                 event: "connexion_google_reussie",
                 userId: loggedUser.uid,
@@ -142,7 +137,6 @@ export default function UserAuthForm() {
                 variant: "destructive",
             });
 
-            // Log error
             const errorLog: LogEntry = {
                 event: "connexion_google_echec",
                 userId: "",

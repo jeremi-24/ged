@@ -11,7 +11,7 @@ const GoogleAuthCallback = () => {
 
     if (accessToken) {
       sessionStorage.setItem('googleAccessToken', accessToken);
-      router.push('/documents/nouveau_document'); // Redirection vers la page principale après connexion
+      router.push('/documents/nouveau_document'); 
     } else {
       console.error('Access token not found in URL hash');
     }

@@ -15,7 +15,6 @@ import Contenu from "./contenu";
 import { Toaster } from "@/components/ui/toaster";
 import { useLanguage } from "@/components/providers/language-provider";
 
-
 export default function AccountPage() {
   const { t } = useLanguage();
   return (
@@ -43,7 +42,6 @@ export default function AccountPage() {
       <Contenu />
       <Toaster />
     </ContentLayout>
-
 
   );
 }

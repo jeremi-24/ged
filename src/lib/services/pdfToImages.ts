@@ -1,6 +1,6 @@
-// lib/pdfToImages.ts
+
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs'
-import 'pdfjs-dist/legacy/build/pdf.worker.mjs'; // Importer le worker ici
+import 'pdfjs-dist/legacy/build/pdf.worker.mjs'; 
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.js';
 

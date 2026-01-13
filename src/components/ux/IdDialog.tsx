@@ -2,10 +2,10 @@
 import { Dialog, DialogPortal, DialogOverlay, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { auth, firestore } from '@/firebase/config'; // Votre configuration Firebase
-import { doc, setDoc } from 'firebase/firestore'; // Pour envoyer les données à Firestore
-import { ClipLoader } from 'react-spinners'; // Spinner pour l'indication d'envoi
-import { onAuthStateChanged } from 'firebase/auth'; // Utilisation de onAuthStateChanged pour suivre l'utilisateur
+import { auth, firestore } from '@/firebase/config'; 
+import { doc, setDoc } from 'firebase/firestore'; 
+import { ClipLoader } from 'react-spinners'; 
+import { onAuthStateChanged } from 'firebase/auth'; 
 
 import IdUpload from './IdUpload';
 import OrcFillForm from './OrcFillForm';
@@ -19,42 +19,38 @@ interface IdDialogProps {
 
 const IdDialog = ({ isOpen, onClose, onStartSteps }: IdDialogProps) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null); // Fichier téléchargé
-  const [imageUrl, setImageUrl] = useState<string>(''); // URL de l'image téléchargée
-  const [userFormData, setUserFormData] = useState({ numero: '' }); // Données utilisateur
-  const [isSubmitting, setIsSubmitting] = useState(false); // État de soumission
-  const [error, setError] = useState<string | null>(null); // Erreur possible
-  const [user, setUser] = useState<any>(null); // Utilisateur connecté
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null); 
+  const [imageUrl, setImageUrl] = useState<string>(''); 
+  const [userFormData, setUserFormData] = useState({ numero: '' }); 
+  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [error, setError] = useState<string | null>(null); 
+  const [user, setUser] = useState<any>(null); 
 
-  // Utilisation de onAuthStateChanged pour suivre l'état de l'utilisateur
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user); // Met à jour l'état avec l'utilisateur actuel
+      setUser(user); 
     });
 
-    // Nettoyage lorsque le composant est démonté
     return () => unsubscribe();
   }, []);
 
-  // Fonction pour gérer l'upload du fichier
   const handleFileDrop = useCallback((file: File) => {
     setUploadedFile(file);
     const fileUrl = URL.createObjectURL(file);
-    setImageUrl(fileUrl); // Mettre à jour l'URL de l'image
+    setImageUrl(fileUrl); 
   }, []);
 
-  // Fonction pour avancer à l'étape suivante
   const handleNextStep = async () => {
     if (currentStep === 1) {
       if (!uploadedFile) {
         alert("Veuillez télécharger une photo de votre carte d'identité.");
         return;
       }
-      setCurrentStep(currentStep + 1); // Passer à l'étape 2
+      setCurrentStep(currentStep + 1); 
     } else if (currentStep === 2) {
-      setCurrentStep(currentStep + 1); // Passer à l'étape 3
+      setCurrentStep(currentStep + 1); 
     } else if (currentStep === 3) {
-      // Fonction finalisation et envoi des données à Firestore
+      
       if (!user) {
         setError('Utilisateur non connecté');
         return;
@@ -64,7 +60,7 @@ const IdDialog = ({ isOpen, onClose, onStartSteps }: IdDialogProps) => {
       setError(null);
 
       try {
-        // Envoi des données dans Firestore sous le document de l'utilisateur
+        
         const userDocRef = doc(firestore, 'users', user.uid);
         await setDoc(userDocRef, {
           numero: userFormData.numero,
@@ -72,13 +68,13 @@ const IdDialog = ({ isOpen, onClose, onStartSteps }: IdDialogProps) => {
         }, { merge: true });
 
         setIsSubmitting(false);
-        onClose(); // Fermer la fenêtre après l'envoi
+        onClose(); 
       } catch (err) {
         setIsSubmitting(false);
         setError('Une erreur est survenue lors de l\'envoi des données.');
       }
     } else {
-      onClose(); // Fermer le dialogue après la dernière étape
+      onClose(); 
     }
   };
 
@@ -94,8 +90,8 @@ const IdDialog = ({ isOpen, onClose, onStartSteps }: IdDialogProps) => {
             </DialogDescription>
           </DialogHeader>
 
-          {/* Conteneur des étapes avec Framer Motion */}
-          <div className="relative w-full h-[400px]"> {/* Ajustez ici la hauteur du conteneur */}
+          {}
+          <div className="relative w-full h-[400px]"> {}
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}

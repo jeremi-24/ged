@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
-
 import UserAuthForm from './signup-auth-form';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
@@ -10,8 +9,6 @@ export const metadata: Metadata = {
   title: 'Authentification',
   description: 'Formulaire d&apos;inscription'
 };
-
-
 
 export default function SignUpViewPage() {
   return (

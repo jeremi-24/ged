@@ -41,7 +41,7 @@ const FileUpload = ({ onDrop }: FileUploadProps) => {
       >
         <input {...getInputProps()} />
 
-        {/* Animated background glows */}
+        {}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
           <div className="absolute top-0 -left-1/4 w-1/2 h-1/2 bg-blue-500/10 blur-[100px] rounded-full" />
           <div className="absolute bottom-0 -right-1/4 w-1/2 h-1/2 bg-indigo-500/10 blur-[100px] rounded-full" />
@@ -83,7 +83,7 @@ const FileUpload = ({ onDrop }: FileUploadProps) => {
           </div>
         </div>
 
-        {/* Decorative elements */}
+        {}
         <AnimatePresence>
           {isDragActive && (
             <motion.div

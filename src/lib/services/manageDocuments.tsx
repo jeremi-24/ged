@@ -1,18 +1,16 @@
-// functions/manageDocuments.ts
-import { firestore } from '../../firebase/config'; // Importer la configuration Firestore
-import { doc, deleteDoc } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth'; // Importer l'authentification Firebase
 
-// Fonction pour obtenir l'ID de l'utilisateur actuel
+import { firestore } from '../../firebase/config'; 
+import { doc, deleteDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth'; 
+
 const getCurrentUserId = () => {
   const auth = getAuth();
   const user = auth.currentUser;
-  return user ? user.uid : null; // Retourner l'ID de l'utilisateur ou null s'il n'est pas connecté
+  return user ? user.uid : null; 
 };
 
-// Fonction pour supprimer un seul document
 export const deleteDocument = async (documentId: string) => {
-  const userId = getCurrentUserId(); // Obtenir l'ID de l'utilisateur actuel
+  const userId = getCurrentUserId(); 
 
   if (!userId) {
     console.error("Aucun utilisateur connecté.");
@@ -20,7 +18,7 @@ export const deleteDocument = async (documentId: string) => {
   }
 
   try {
-    // Supprimer le document dans la sous-collection 'documents' de l'utilisateur
+    
     await deleteDoc(doc(firestore, 'users', userId, 'documents', documentId));
     
     console.log(`Document avec ID ${documentId} supprimé de l'utilisateur ${userId}.`);
@@ -30,9 +28,8 @@ export const deleteDocument = async (documentId: string) => {
   }
 };
 
-// Fonction pour supprimer plusieurs documents
 export const deleteDocuments = async (documentIds: string[]) => {
-  const userId = getCurrentUserId(); // Obtenir l'ID de l'utilisateur actuel
+  const userId = getCurrentUserId(); 
 
   if (!userId) {
     console.error("Aucun utilisateur connecté.");

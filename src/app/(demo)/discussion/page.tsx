@@ -28,8 +28,7 @@ export default function Chat() {
               <Link href="/dashboard">Dashboard</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
-         
-         
+
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>Discussion</BreadcrumbPage>

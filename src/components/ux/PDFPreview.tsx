@@ -87,7 +87,7 @@ const PDFPreview: React.FC<PDFPreviewProps> = ({ pdfUrl }) => {
 
   return (
     <div className="relative group flex flex-col h-full bg-zinc-100 dark:bg-zinc-900 rounded-xl overflow-hidden shadow-inner">
-      {/* Premium Control Bar */}
+      {}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 p-1 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
         <div className="flex items-center gap-1 border-r border-zinc-200 dark:border-zinc-800 pr-1">
           <Button
@@ -136,7 +136,7 @@ const PDFPreview: React.FC<PDFPreviewProps> = ({ pdfUrl }) => {
         </div>
       </div>
 
-      {/* PDF Viewport */}
+      {}
       <div className="flex-1 overflow-auto scrollbar-hide flex items-start justify-center p-8 pt-16">
         <div className={cn(
           "relative transition-opacity duration-300",
@@ -154,7 +154,7 @@ const PDFPreview: React.FC<PDFPreviewProps> = ({ pdfUrl }) => {
         </div>
       </div>
 
-      {/* Footer Info (Subtle) */}
+      {}
       <div className="p-3 bg-white/50 dark:bg-black/20 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-6">
         <div className="flex items-center gap-2">
           <MousePointer2 className="w-3 h-3" />

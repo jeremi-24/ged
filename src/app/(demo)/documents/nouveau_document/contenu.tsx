@@ -28,7 +28,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-// Étape 1: Interface pour DocumentData
 interface DocumentData {
   id: string;
   name: string;
@@ -95,11 +94,10 @@ export default function Contenu() {
     } catch (error: any) {
       console.error("Batch upload error:", error);
     } finally {
-      // On garde activeFiles un court instant pour l'animation puis on nettoie
+      
       setTimeout(() => setUploading(false), 2000);
     }
   };
-
 
   const handlePdfUpload = async (file: File) => {
     updateFileStatus(file.name, { step: 'processing', progress: 10 });

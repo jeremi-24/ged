@@ -1,4 +1,4 @@
-// components/ui/DataTable.tsx
+
 
 import React from 'react';
 

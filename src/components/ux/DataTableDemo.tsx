@@ -74,7 +74,7 @@ interface DataTableDemoProps {
 const formatDate = (date: any) => {
   if (!date) return "N/A";
   try {
-    // Check if it's a Firestore Timestamp
+    
     if (date && typeof date === 'object' && 'seconds' in date) {
       return new Date(date.seconds * 1000).toLocaleDateString();
     }
@@ -241,7 +241,6 @@ export function DataTableDemo({ onRefresh, onDocumentClick, setSelectedIds, view
     loadDocuments();
     onRefresh(loadDocuments);
   }, [loadDocuments, onRefresh]);
-
 
   const handleRowClick = (document: DocumentData) => {
     onDocumentClick(document);

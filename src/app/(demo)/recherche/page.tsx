@@ -22,29 +22,28 @@ export default function CategoriesPage() {
 
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const [user, setUser] = useState<any>(null); // État pour stocker l'utilisateur authentifié
+  const [user, setUser] = useState<any>(null); 
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        console.log("Utilisateur authentifié:", currentUser); // Afficher les détails de l'utilisateur
-        setUser(currentUser); // Mettez à jour l'utilisateur authentifié
+        console.log("Utilisateur authentifié:", currentUser); 
+        setUser(currentUser); 
         
         try {
-          const role = await getUserRole(currentUser.uid); // Récupérez le rôle de l'utilisateur
-          console.log("Rôle de l'utilisateur:", role); // Afficher le rôle dans la console
-          setIsAdmin(role === "admin"); // Vérifiez si l'utilisateur est admin
+          const role = await getUserRole(currentUser.uid); 
+          console.log("Rôle de l'utilisateur:", role); 
+          setIsAdmin(role === "admin"); 
         } catch (error) {
-          console.error("Erreur lors de la récupération du rôle:", error); // Afficher les erreurs
+          console.error("Erreur lors de la récupération du rôle:", error); 
         }
       } else {
-        console.log("Aucun utilisateur connecté."); // Alerte si aucun utilisateur n'est connecté
-        setUser(null); // Aucun utilisateur connecté
+        console.log("Aucun utilisateur connecté."); 
+        setUser(null); 
       }
-      setLoading(false); // Arrêtez le chargement une fois que l'état est déterminé
+      setLoading(false); 
     });
 
-    // Nettoyage de l'écouteur lors du démontage du composant
     return () => unsubscribe();
   }, []);
   return (
@@ -69,11 +68,11 @@ export default function CategoriesPage() {
         </BreadcrumbList>
       </Breadcrumb>
       {loading ? (
-        <p>Chargement...</p> // Affiche un message de chargement si le rôle est en train d'être récupéré
+        <p>Chargement...</p> 
       ) : isAdmin ? (
-        <AdminContent /> // Affiche le contenu admin si l'utilisateur est admin
+        <AdminContent /> 
       ) : (
-        <Contenu /> // Sinon, affiche le contenu normal
+        <Contenu /> 
       )}
     </ContentLayout>
   );

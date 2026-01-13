@@ -1,5 +1,5 @@
 'use client';
-// Assurez-vous d'importer la bonne fonction
+
 import React, { useEffect, useState } from 'react';
 import { Pie } from 'react-chartjs-2';
 import {
@@ -12,7 +12,6 @@ import {
 import { fetchDocuments } from '@/lib/services/CRUD/fetchDocument';
 import { DocumentData } from "@/types/types";
 
-// Enregistrez les composants nécessaires de Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface DocumentChartProps {
@@ -24,14 +23,13 @@ const DocumentChart: React.FC<DocumentChartProps> = ({ docs }) => {
 
   useEffect(() => {
     const processData = (documents: DocumentData[]) => {
-      // Comptez le nombre de documents par classification
+      
       const classificationCounts: Record<string, number> = {};
       documents.forEach(doc => {
         const classification = doc.classification || 'Sans classification';
         classificationCounts[classification] = (classificationCounts[classification] || 0) + 1;
       });
 
-      // Préparez les données pour le graphique
       const labels = Object.keys(classificationCounts);
       const data = Object.values(classificationCounts);
 
@@ -42,12 +40,12 @@ const DocumentChart: React.FC<DocumentChartProps> = ({ docs }) => {
             label: 'Documents',
             data,
             backgroundColor: [
-              'rgba(59, 130, 246, 0.8)', // blue-500
-              'rgba(16, 185, 129, 0.8)', // emerald-500
-              'rgba(245, 158, 11, 0.8)', // amber-500
-              'rgba(239, 68, 68, 0.8)',  // red-500
-              'rgba(139, 92, 246, 0.8)', // violet-500
-              'rgba(236, 72, 153, 0.8)', // pink-500
+              'rgba(59, 130, 246, 0.8)', 
+              'rgba(16, 185, 129, 0.8)', 
+              'rgba(245, 158, 11, 0.8)', 
+              'rgba(239, 68, 68, 0.8)',  
+              'rgba(139, 92, 246, 0.8)', 
+              'rgba(236, 72, 153, 0.8)', 
             ],
             borderWidth: 0,
             hoverOffset: 10

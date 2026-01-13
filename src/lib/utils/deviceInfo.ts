@@ -1,7 +1,6 @@
-// src/lib/utils/deviceInfo.ts
+
 import UAParser from 'ua-parser-js';
 
-// Fonction pour obtenir les informations du device
 export const getDeviceInfo = () => {
   const parser = new UAParser();
   const result = parser.getResult();
@@ -15,7 +14,6 @@ export const getDeviceInfo = () => {
     browserVersion: result.browser.version || "",
   };
 
-  // Formatage des informations en une chaîne lisible
   return `Appareil: ${deviceInfo.deviceVendor} ${deviceInfo.deviceModel}, 
           OS: ${deviceInfo.osName} ${deviceInfo.osVersion}, 
           Navigateur: ${deviceInfo.browserName} ${deviceInfo.browserVersion}`;

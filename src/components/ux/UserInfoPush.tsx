@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
 
 type UserInfoPushProps = {
-  userFormData: { numero: string;  }; // Données à afficher
+  userFormData: { numero: string;  }; 
 };
 
 const UserInfoPush = ({ userFormData }: UserInfoPushProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fonction pour simuler l'envoi des informations
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setError(null);
 
     try {
-      // Simuler une attente (remplacer par l'appel à une API ou à Firestore)
+      
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Ici, on simule l'envoi réussi des données
       console.log('Informations envoyées :', userFormData);
       setIsSubmitting(false);
     } catch (err) {
@@ -33,7 +31,7 @@ const UserInfoPush = ({ userFormData }: UserInfoPushProps) => {
         Merci de vérifier les informations suivantes avant de finaliser.
       </p>
 
-      {/* Affichage des informations de l'utilisateur */}
+      {}
       <div className="grid grid-cols-1 gap-4">
         <div className="flex justify-between items-center">
           <label className="font-medium text-gray-700">Numéro :</label>
@@ -42,10 +40,10 @@ const UserInfoPush = ({ userFormData }: UserInfoPushProps) => {
         
       </div>
 
-      {/* Affichage des erreurs */}
+      {}
       {error && <p className="text-red-500 text-center font-medium">{error}</p>}
 
-      {/* Bouton de soumission */}
+      {}
       <div className="flex justify-center">
         <button
           onClick={handleSubmit}

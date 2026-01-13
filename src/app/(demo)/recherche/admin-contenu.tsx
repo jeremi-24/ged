@@ -35,12 +35,11 @@ export default function AdminContent() {
   const [showTooltip, setShowTooltip] = useState(true);
 
   useEffect(() => {
-    // Masque le panneau après 5 secondes
+    
     const timer = setTimeout(() => {
       setShowTooltip(false);
     }, 5000);
 
-    // Nettoyage du timer lors de la déconstruction du composant
     return () => clearTimeout(timer);
   }, []);
 
@@ -52,8 +51,6 @@ export default function AdminContent() {
       clearTimeout(handler);
     };
   }, [searchText]);
-
-
 
   const filteredResults = results.filter(doc => {
     const matchesClassification = classificationFilter ? doc.classification === classificationFilter : true;
@@ -72,18 +69,18 @@ export default function AdminContent() {
   });
 
   const handleVoiceSearch = () => {
-    // Vérifie si la reconnaissance vocale est supportée
+    
     if (!('webkitSpeechRecognition' in window)) {
       alert('Votre navigateur ne prend pas en charge la recherche vocale.');
       return;
     }
 
     const recognition = new (window as any).webkitSpeechRecognition();
-    recognition.lang = 'fr-FR'; // Définir la langue
+    recognition.lang = 'fr-FR'; 
 
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript; // Récupère le texte reconnu
-      setSearchText(transcript); // Met à jour le texte de recherche
+      const transcript = event.results[0][0].transcript; 
+      setSearchText(transcript); 
     };
 
     recognition.onerror = (event: any) => {
@@ -91,20 +88,16 @@ export default function AdminContent() {
 
       toast({
         title: "Erreur",
-        description: `Erreur de reconnaissance vocale: ${event.error}`, // Utilisation correcte de la variable event.error
+        description: `Erreur de reconnaissance vocale: ${event.error}`, 
         variant: "destructive",
       });
     };
 
-
-    recognition.start(); // Démarre la reconnaissance vocale
+    recognition.start(); 
   };
-
-
 
   const uniqueClassifications = Array.from(new Set(results.map(doc => doc.classification)));
 
-  // Tri des résultats
   let sortedResults = [...filteredResults];
   if (sortOption === 'name') {
     sortedResults.sort((a, b) => a.name.localeCompare(b.name));
@@ -116,7 +109,6 @@ export default function AdminContent() {
     });
   }
 
-  // Groupement des résultats
   const groupedResults = groupOption ? sortedResults.reduce((groups, doc) => {
     const groupKey = groupOption === 'classification'
       ? doc.classification
@@ -153,32 +145,30 @@ export default function AdminContent() {
 
       const a = document.createElement('a');
       a.href = urlBlob;
-      a.download = fileName; // Utiliser le nom du document ici
+      a.download = fileName; 
       document.body.appendChild(a);
       a.click();
       a.remove();
-      window.URL.revokeObjectURL(urlBlob); // Libérer l'URL blob
+      window.URL.revokeObjectURL(urlBlob); 
 
       const deviceDetails = getDeviceInfo();
       const auth = getAuth();
-      const user = auth.currentUser; // Obtenez l'utilisateur connecté
+      const user = auth.currentUser; 
 
-      // Enregistrement du log après le succès du téléchargement
       const logEntry: LogEntry = {
         event: "téléchargement_de_document",
-        documentId: fileName, // Utiliser fileName ou un ID unique si disponible
+        documentId: fileName, 
         createdAt: new Date(),
         details: `Le document ${fileName} a été téléchargé avec succès`,
-        userId: user ? user.uid : "Utilisateur non connecté", // Ajouter l'ID utilisateur ici si disponible
+        userId: user ? user.uid : "Utilisateur non connecté", 
         device: `Depuis ${deviceDetails}`,
       };
 
       if (user) {
-        await logEvent(logEntry, user.uid); // Appel à logEvent avec user.uid
+        await logEvent(logEntry, user.uid); 
       } else {
         console.error("Erreur : utilisateur non connecté");
       }
-
 
       setDialogTitle("");
       setDialogDescription(`Le document ${fileName} a été téléchargé avec succès.`);
@@ -187,7 +177,7 @@ export default function AdminContent() {
 
       toast({
         title: "Erreur",
-        description: `Erreur lors du téléchargement du fichier: ${error}`, // Utilisation correcte de la variable event.error
+        description: `Erreur lors du téléchargement du fichier: ${error}`, 
         variant: "destructive",
       });
     }
@@ -235,7 +225,6 @@ export default function AdminContent() {
               </div>
             </div>
 
-
             <div className="overflow-auto min-h-[300px] max-h-[500px]">
               {Object.keys(groupedResults).map((group) => (
                 <div key={group}>
@@ -243,7 +232,7 @@ export default function AdminContent() {
                   <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 p-4">
                     {groupedResults[group].map((doc) => (
                       <li key={doc.id} className="relative card-pro group/card animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        {/* Vérification si doc.url existe avant de construire le lien */}
+                        {}
                         {doc.url ? (
                           <div className="h-full flex flex-col">
                             <Link href={`/discussion?id=${doc.url}&text=${encodeURIComponent(doc.text)}&texte=${encodeURIComponent(doc.url)}`} className="block">
@@ -315,7 +304,7 @@ export default function AdminContent() {
               </div>
 
               <div className="space-y-6">
-                {/* Classification */}
+                {}
                 <div className="space-y-3">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Classification</label>
                   <Select value={classificationFilter} onValueChange={setClassificationFilter}>
@@ -331,7 +320,7 @@ export default function AdminContent() {
                   </Select>
                 </div>
 
-                {/* Date */}
+                {}
                 <div className="space-y-3">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Période</label>
                   <Popover>
@@ -359,7 +348,7 @@ export default function AdminContent() {
                   </Popover>
                 </div>
 
-                {/* Sorting */}
+                {}
                 <div className="space-y-3">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Trier par</label>
                   <div className="flex flex-col gap-2">
@@ -385,7 +374,7 @@ export default function AdminContent() {
                   </div>
                 </div>
 
-                {/* Grouping */}
+                {}
                 <div className="space-y-3 pt-6 border-t border-border">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Grouper par</label>
                   <div className="flex gap-2">

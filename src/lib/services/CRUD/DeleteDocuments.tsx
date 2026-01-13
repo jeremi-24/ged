@@ -19,13 +19,13 @@ import { logEvent } from '../logEvent';
 
 import { LogEntry } from '@/types/Logs';
 import { getDeviceInfo } from '@/lib/utils/deviceInfo';
-import { useToast } from "@/hooks/use-toast"; // Importing useToast hook
-import { ToastAction } from "@/components/ui/toast"; // Importing ToastAction component
-import { auth } from '@/firebase/config'; // Assurez-vous que l'authentification Firebase est configurée
+import { useToast } from "@/hooks/use-toast"; 
+import { ToastAction } from "@/components/ui/toast"; 
+import { auth } from '@/firebase/config'; 
 
 interface DeleteDocumentsProps {
   selectedDocument: DocumentData | null;
-  selectedIds: string; // Garder ici comme une chaîne
+  selectedIds: string; 
   setSelectedIds: (id: string) => void;
   refreshDocuments: () => void;
 }
@@ -36,29 +36,27 @@ const DeleteDocuments: React.FC<DeleteDocumentsProps> = ({
   selectedIds,
   setSelectedIds,
 }) => {
-  const [open, setOpen] = useState(false); // État pour contrôler l'ouverture du dialogue
-  const { toast } = useToast(); // Initialize toast
+  const [open, setOpen] = useState(false); 
+  const { toast } = useToast(); 
   const handleDeleteSelected = async () => {
     try {
       if (selectedDocument) {
-        await deleteDocument(selectedDocument.id); // Suppression d'un document unique
+        await deleteDocument(selectedDocument.id); 
 
-        // Récupérer l'ID de l'utilisateur actuellement connecté
-        const userId = auth.currentUser?.uid || 'unknown'; // Utiliser l'ID de l'utilisateur ou 'unknown' si l'utilisateur n'est pas connecté
+        const userId = auth.currentUser?.uid || 'unknown'; 
 
-        // Enregistrement du log après la suppression réussie
         const logEntry: LogEntry = {
           event: "document_deleted",
           documentId: selectedDocument.id,
           createdAt: new Date(),
           details: `Document ${selectedDocument.name} a été supprimé. ${deviceDetails}`,
-          userId, // Ajout du userId ici
+          userId, 
           device: `Depuis l'appareil. ${deviceDetails}`,
         };
-        await logEvent(logEntry, userId); // Enregistre le log avec le userId
+        await logEvent(logEntry, userId); 
 
-        setSelectedIds(''); // Réinitialise la sélection après la suppression
-        refreshDocuments(); // Appelle la fonction pour rafraîchir les documents après la suppression
+        setSelectedIds(''); 
+        refreshDocuments(); 
       }
       toast({
         title: "Succès",
@@ -68,8 +66,8 @@ const DeleteDocuments: React.FC<DeleteDocumentsProps> = ({
             <Image 
               src="/check.png" 
               alt="Animation de succès"
-              width={30} // Ajuste la taille en pixels
-              height={30} // Ajuste la taille en pixels
+              width={30} 
+              height={30} 
               style={{
                 border: 'none',
               }}
@@ -80,9 +78,9 @@ const DeleteDocuments: React.FC<DeleteDocumentsProps> = ({
 
     } catch (error) {
       console.error("Erreur lors de la suppression :", error);
-      // Vous pourriez afficher un message d'erreur à l'utilisateur ici
+      
     } finally {
-      setOpen(false); // Ferme le dialogue après la suppression
+      setOpen(false); 
     }
   };
 
@@ -93,11 +91,11 @@ const DeleteDocuments: React.FC<DeleteDocumentsProps> = ({
       <DialogTrigger asChild>
         <ButtonAnimation
           variant="expandIcon"
-          Icon={Trash2} // Icône de la corbeille
-          iconPlacement="right" // Position de l'icône
-          size="sm" // Taille du bouton
+          Icon={Trash2} 
+          iconPlacement="right" 
+          size="sm" 
           disabled={!selectedIds && !selectedDocument} 
-          className='rounded-xl w-[180px] bg-red-600 text-white hover:bg-red-700' // Désactiver si aucun document sélectionné
+          className='rounded-xl w-[180px] bg-red-600 text-white hover:bg-red-700' 
         >
           Supprimer 
         </ButtonAnimation>

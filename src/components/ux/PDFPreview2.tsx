@@ -15,7 +15,7 @@ const PDFPreview2: React.FC<PDFPreview2Props> = ({ pdfUrl }) => {
   useEffect(() => {
     const loadPDF = async () => {
       const loadedPdf = await pdfjsLib.getDocument(pdfUrl).promise;
-      renderPage(1, loadedPdf); // Charger la première page
+      renderPage(1, loadedPdf); 
     };
 
     loadPDF();
@@ -25,16 +25,14 @@ const PDFPreview2: React.FC<PDFPreview2Props> = ({ pdfUrl }) => {
     if (!canvasRef.current || !pdfDoc) return;
 
     const page = await pdfDoc.getPage(pageNum);
-    
-    // Définir une largeur fixe désirée et calculer l'échelle
+
     const desiredWidth = 500;
     const viewport = page.getViewport({ scale: 1 });
     const scale = desiredWidth / viewport.width;
     const scaledViewport = page.getViewport({ scale });
 
-    // Configurer le canvas pour le rendu
     canvasRef.current.width = scaledViewport.width;
-    canvasRef.current.height = scaledViewport.height; // hauteur réelle pour le rendu
+    canvasRef.current.height = scaledViewport.height; 
 
     const context = canvasRef.current.getContext('2d');
     if (!context) return;
@@ -53,10 +51,10 @@ const PDFPreview2: React.FC<PDFPreview2Props> = ({ pdfUrl }) => {
       <div
         className="relative overflow-hidden w-full max-w-screen-md"
         style={{
-          height: '200px', // Limite l'affichage du haut de la page
+          height: '200px', 
           width: '100%',
           maxWidth: '500px',
-          overflow: 'hidden', // Masque la partie inférieure
+          overflow: 'hidden', 
         }}
       >
         <canvas
@@ -64,7 +62,7 @@ const PDFPreview2: React.FC<PDFPreview2Props> = ({ pdfUrl }) => {
           className="pdf-canvas border rounded-xl mx-auto"
           style={{
             width: '100%',
-            height: 'auto', // Assure une échelle proportionnelle
+            height: 'auto', 
             display: 'block',
             margin: '0 auto',
           }}

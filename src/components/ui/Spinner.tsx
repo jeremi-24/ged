@@ -1,8 +1,8 @@
-// components/Spinner.tsx
+
 import React from 'react';
 
 interface SpinnerProps {
-  className?: string; // Optionnel pour les styles
+  className?: string; 
 }
 
 const Spinner: React.FC<SpinnerProps> = ({ className }) => {

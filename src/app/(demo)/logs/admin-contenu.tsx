@@ -1,10 +1,10 @@
-// src/components/LogsComponent.tsx
+
 'use client';
 import { Card, CardContent } from '@/components/ui/card';
-import { fetchAllLogs } from '@/lib/services/logsAll'; // Assurez-vous d'importer la fonction correctement
+import { fetchAllLogs } from '@/lib/services/logsAll'; 
 import { LogEntry } from '@/types/Logs';
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, XCircle, User, FileText, Info, Monitor } from 'lucide-react'; // Ajout des icônes supplémentaires
+import { CheckCircle, XCircle, User, FileText, Info, Monitor } from 'lucide-react'; 
 import UserInfoDialog from '@/components/ux/UserInfoDialog';
 
 import { ActivityTimeline } from '@/components/ux/ActivityTimeline';

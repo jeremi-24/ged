@@ -48,7 +48,7 @@ export function RecentActivity({ documents }: RecentActivityProps) {
             </CardHeader>
             <CardContent>
                 <div className="relative space-y-4">
-                    {/* Vertical line */}
+                    {}
                     <div className="absolute left-[19px] top-2 bottom-2 w-px bg-gradient-to-b from-blue-500/50 via-zinc-200 dark:via-zinc-800 to-transparent hidden sm:block" />
 
                     {recentDocs.length > 0 ? (
@@ -60,7 +60,7 @@ export function RecentActivity({ documents }: RecentActivityProps) {
                                 transition={{ delay: index * 0.1 }}
                                 className="relative group pl-0 sm:pl-10"
                             >
-                                {/* Timeline Dot */}
+                                {}
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-blue-500 border-2 border-background z-10 hidden sm:block transition-transform group-hover:scale-150" />
 
                                 <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-zinc-100/50 dark:hover:bg-zinc-900/50 transition-all duration-300 group/item">

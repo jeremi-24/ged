@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Contenu } from "./contenu";
 
-
 export default function PostsPage() {
   return (
     <ContentLayout title="Mes documents">

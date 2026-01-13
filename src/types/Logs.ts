@@ -1,10 +1,10 @@
-// src/types/logs.ts
+
 export interface LogEntry {
-    event: string;  // Type d'événement (ex: "document_uploaded", "document_deleted")
-    documentId: string;  // ID du document concerné
+    event: string;  
+    documentId: string;  
      userId : string;
-    createdAt: Date; // Heure de l'événement
-    details?: string;  // Informations supplémentaires (facultatif)
+    createdAt: Date; 
+    details?: string;  
     device : string;
   }
   

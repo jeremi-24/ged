@@ -34,7 +34,7 @@ const staggerContainer = {
 export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-background selection:bg-primary/20">
-      {/* Premium Navigation */}
+      {}
       <header className="fixed top-0 w-full z-50 border-b bg-background/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-20 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2 group">
@@ -68,15 +68,15 @@ export default function HomePage() {
       </header>
 
       <main className="flex-1 pt-20">
-        {/* Dynamic Hero Section */}
+        {}
         <section className="relative overflow-hidden py-20 lg:py-32">
-          {/* Background Decorative Elements */}
+          {}
           <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full">
               <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
               <div className="absolute bottom-[-10%] right-[20%] w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px]" />
             </div>
-            {/* Added Doodles-like subtle organic shape */}
+            {}
             <div className="absolute top-1/4 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl opacity-30 -translate-x-1/2" />
             <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl opacity-30 translate-x-1/2" />
           </div>
@@ -123,7 +123,7 @@ export default function HomePage() {
               </Button>
             </motion.div>
 
-            {/* Product Mockup */}
+            {}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -142,7 +142,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Dynamic Features Section */}
+        {}
         <section id="features" className="py-24 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
@@ -203,7 +203,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* How it Works / Steps Section */}
+        {}
         <section id="how-it-works" className="py-24 border-t">
           <div className="container mx-auto px-4">
             <div className="flex flex-col lg:flex-row items-center gap-16">
@@ -234,7 +234,7 @@ export default function HomePage() {
               <div className="flex-1 relative">
                 <div className="aspect-square bg-gradient-to-tr from-primary/20 to-blue-500/20 rounded-[4rem] flex items-center justify-center p-8">
                   <div className="bg-card w-full h-full rounded-[3rem] shadow-2xl overflow-hidden border">
-                    {/* Placeholder for interactive illustration or video */}
+                    {}
                     <div className="w-full h-full flex flex-col items-center justify-center space-y-4 p-12 text-center">
                       <CheckCircle2 className="w-20 h-20 text-primary mb-4" />
                       <h3 className="text-2xl font-bold italic">Prêt à transformer votre entreprise ?</h3>
@@ -248,7 +248,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Final CTA Section */}
+        {}
         <section className="py-24">
           <div className="container mx-auto px-4">
             <div className="bg-primary rounded-[3rem] p-12 md:p-24 text-center text-primary-foreground relative overflow-hidden shadow-2xl shadow-primary/40">
@@ -272,7 +272,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Modern Footer */}
+      {}
       <footer className="bg-background border-t py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">

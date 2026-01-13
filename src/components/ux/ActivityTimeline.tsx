@@ -93,7 +93,7 @@ const GroupHeader = ({ date }: { date: string }) => {
 };
 
 export const ActivityTimeline = ({ logs, showUser = false }: ActivityTimelineProps) => {
-    // Group logs by date
+    
     const sortedLogs = [...logs].sort((a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
@@ -125,7 +125,7 @@ export const ActivityTimeline = ({ logs, showUser = false }: ActivityTimelinePro
                                     transition={{ delay: index * 0.05 }}
                                     className="relative group sm:pl-10"
                                 >
-                                    {/* Timeline Dot */}
+                                    {}
                                     <div className={cn(
                                         "absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-background z-10 hidden sm:block transition-transform group-hover:scale-125",
                                         config.color

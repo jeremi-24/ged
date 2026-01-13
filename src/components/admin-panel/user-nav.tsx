@@ -21,7 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { auth, firestore } from "@/firebase/config"; // Importez votre configuration Firebase
+import { auth, firestore } from "@/firebase/config"; 
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -31,7 +31,7 @@ export function UserNav() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
       if (authUser) {
-        // Fetch additional data from Firestore
+        
         try {
           const userDoc = await getDoc(doc(firestore, "users", authUser.uid));
           if (userDoc.exists()) {

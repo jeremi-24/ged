@@ -59,37 +59,34 @@ export default function Contenu() {
   });
 
   const handleVoiceSearch = () => {
-    // Vérifie si la reconnaissance vocale est supportée
+    
     if (!('webkitSpeechRecognition' in window)) {
       alert('Votre navigateur ne prend pas en charge la recherche vocale.');
       return;
     }
 
     const recognition = new (window as any).webkitSpeechRecognition();
-    recognition.lang = 'fr-FR'; // Définir la langue
+    recognition.lang = 'fr-FR'; 
 
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript; // Récupère le texte reconnu
-      setSearchText(transcript); // Met à jour le texte de recherche
+      const transcript = event.results[0][0].transcript; 
+      setSearchText(transcript); 
     };
 
     recognition.onerror = (event: any) => {
 
       toast({
         title: "Erreur",
-        description: `Erreur de reconnaissance vocale: ${event.error}`, // Utilisation correcte de la variable event.error
+        description: `Erreur de reconnaissance vocale: ${event.error}`, 
         variant: "destructive",
-      });// Log d'erreur
+      });
     };
 
-    recognition.start(); // Démarre la reconnaissance vocale
+    recognition.start(); 
   };
-
-
 
   const uniqueClassifications = Array.from(new Set(results.map(doc => doc.classification)));
 
-  // Tri des résultats
   let sortedResults = [...filteredResults];
   if (sortOption === 'name') {
     sortedResults.sort((a, b) => a.name.localeCompare(b.name));
@@ -101,7 +98,6 @@ export default function Contenu() {
     });
   }
 
-  // Groupement des résultats
   const groupedResults = groupOption ? sortedResults.reduce((groups, doc) => {
     const groupKey = groupOption === 'classification'
       ? doc.classification
@@ -138,32 +134,30 @@ export default function Contenu() {
 
       const a = document.createElement('a');
       a.href = urlBlob;
-      a.download = fileName; // Utiliser le nom du document ici
+      a.download = fileName; 
       document.body.appendChild(a);
       a.click();
       a.remove();
-      window.URL.revokeObjectURL(urlBlob); // Libérer l'URL blob
+      window.URL.revokeObjectURL(urlBlob); 
 
       const deviceDetails = getDeviceInfo();
       const auth = getAuth();
-      const user = auth.currentUser; // Obtenez l'utilisateur connecté
+      const user = auth.currentUser; 
 
-      // Enregistrement du log après le succès du téléchargement
       const logEntry: LogEntry = {
         event: "téléchargement_de_document",
-        documentId: fileName, // Utiliser fileName ou un ID unique si disponible
+        documentId: fileName, 
         createdAt: new Date(),
         details: `Le document ${fileName} a été téléchargé avec succès`,
-        userId: user ? user.uid : "Utilisateur non connecté", // Ajouter l'ID utilisateur ici si disponible
+        userId: user ? user.uid : "Utilisateur non connecté", 
         device: `Depuis ${deviceDetails}`,
       };
 
       if (user) {
-        await logEvent(logEntry, user.uid); // Appel à logEvent avec user.uid
+        await logEvent(logEntry, user.uid); 
       } else {
         console.error("Erreur : utilisateur non connecté");
       }
-
 
       setDialogTitle("");
       setDialogDescription(`Le document ${fileName} a été téléchargé avec succès.`);
@@ -172,8 +166,6 @@ export default function Contenu() {
       console.error("Erreur lors du téléchargement du fichier :", error);
     }
   };
-
-
 
   const [isListening, setIsListening] = useState(false);
 
@@ -225,7 +217,7 @@ export default function Contenu() {
       <UserInfoDialog />
       <ResizablePanelGroup direction="horizontal" className="h-full">
         <ResizablePanel defaultSize={70} minSize={60} className="flex flex-col">
-          {/* Header Search Area */}
+          {}
           <div className="p-8 border-b border-border bg-muted/30">
             <div className="max-w-3xl mx-auto w-full space-y-6">
               <div className="text-center space-y-2">
@@ -256,7 +248,7 @@ export default function Contenu() {
             </div>
           </div>
 
-          {/* Results Area */}
+          {}
           <div className="flex-1 overflow-auto p-8">
             <AnimatePresence mode="wait">
               {Object.keys(groupedResults).length > 0 && filteredResults.length > 0 ? (
@@ -341,7 +333,7 @@ export default function Contenu() {
             </div>
 
             <div className="space-y-6">
-              {/* Classification */}
+              {}
               <div className="space-y-3">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Classification</label>
                 <Select value={classificationFilter} onValueChange={setClassificationFilter}>
@@ -357,7 +349,7 @@ export default function Contenu() {
                 </Select>
               </div>
 
-              {/* Date */}
+              {}
               <div className="space-y-3">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Période</label>
                 <Popover>
@@ -385,7 +377,7 @@ export default function Contenu() {
                 </Popover>
               </div>
 
-              {/* Sorting */}
+              {}
               <div className="space-y-3">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Trier par</label>
                 <div className="flex flex-col gap-2">
@@ -411,7 +403,7 @@ export default function Contenu() {
                 </div>
               </div>
 
-              {/* Grouping */}
+              {}
               <div className="space-y-3 pt-6 border-t border-border">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Grouper par</label>
                 <div className="flex gap-2">

@@ -40,12 +40,11 @@ interface IconRefProps {
   iconPlacement?: undefined;
 }
 
-// Ajout de la prop 'url' dans ButtonProps
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
-  url?: string; // Nouvelle prop pour l'URL
+  url?: string; 
 }
 
 export type ButtonIconProps = IconProps | IconRefProps;
@@ -62,17 +61,16 @@ const ButtonAnimation = React.forwardRef<
       asChild = false,
       Icon,
       iconPlacement,
-      url, // Récupération de l'URL
+      url, 
       ...props
     },
     ref
   ) => {
     const Comp = asChild ? Slot : "button";
 
-    // Fonction pour gérer le clic
     const handleClick = () => {
       if (url) {
-        window.location.href = url; // Redirige vers l'URL si définie
+        window.location.href = url; 
       }
     };
 
@@ -80,7 +78,7 @@ const ButtonAnimation = React.forwardRef<
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
-        onClick={handleClick} // Ajout de la fonction de clic
+        onClick={handleClick} 
         {...props}
       >
         {Icon && iconPlacement === "left" && (

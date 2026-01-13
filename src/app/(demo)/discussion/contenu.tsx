@@ -97,7 +97,7 @@ const Contenu = () => {
       <UserInfoDialog />
 
       <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-180px)]">
-        {/* Left Aspect: Document Preview */}
+        {}
         <motion.div
           className={cn(
             "transition-all duration-500 ease-in-out",
@@ -154,7 +154,7 @@ const Contenu = () => {
           </Card>
         </motion.div>
 
-        {/* Right Aspect: Chat Interface */}
+        {}
         <motion.div
           className={cn(
             "flex-1 flex flex-col transition-all duration-500",

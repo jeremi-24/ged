@@ -7,12 +7,12 @@ import Image from 'next/image';
 import IdDialog from './IdDialog';
 
 const UserInfoDialog = () => {
-  const [isDialogOpen, setDialogOpen] = useState(false); // Change initial state to false
+  const [isDialogOpen, setDialogOpen] = useState(false); 
   const [userData, setUserData] = useState<any>(null);
   const [isNameMissing, setIsNameMissing] = useState(false);
   const [isNumberIdMissing, setIsNumberIdMissing] = useState(false);
 
-  const [isSecondDialogOpen, setSecondDialogOpen] = useState(false); // Control second dialog
+  const [isSecondDialogOpen, setSecondDialogOpen] = useState(false); 
 
   useEffect(() => {
     const checkUserInformation = async () => {
@@ -36,16 +36,12 @@ const UserInfoDialog = () => {
         const userData = userDocSnapshot.data();
         setUserData(userData);
 
-        // Verifying missing fields
-       
         const isNumberIdMissing = !userData?.numero;
 
-       
         setIsNumberIdMissing(isNumberIdMissing);
 
-        // Open dialog only if either field is missing
         if ( isNumberIdMissing) {
-          setDialogOpen(true); // Open the dialog if user info is incomplete
+          setDialogOpen(true); 
         }
 
       } catch (error) {
@@ -54,17 +50,16 @@ const UserInfoDialog = () => {
     };
 
     checkUserInformation();
-  }, []); // This effect will run once when the component mounts
+  }, []); 
 
-  // Handle saving identity card info and opening second dialog
   const handleSaveCard = () => {
-    setSecondDialogOpen(true); // Open the second dialog
-    setDialogOpen(false); // Close the first dialog
+    setSecondDialogOpen(true); 
+    setDialogOpen(false); 
   };
 
   return (
     <>
-      {/* First Dialog */}
+      {}
       <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
         <DialogPortal>
           <DialogOverlay className="fixed inset-0 bg-black bg-opacity-50" />
@@ -99,7 +94,7 @@ const UserInfoDialog = () => {
               </button>
 
               <button
-                onClick={() => setDialogOpen(false)} // Close dialog if user clicks 'Later'
+                onClick={() => setDialogOpen(false)} 
                 className="px-6 py-3 bg-gray-300 text-black rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 w-full sm:w-auto"
               >
                 Me rappeler plus tard
@@ -110,7 +105,7 @@ const UserInfoDialog = () => {
         </DialogPortal>
       </Dialog>
 
-      {/* Second Dialog (IdDialog) */}
+      {}
       <IdDialog 
         isOpen={isSecondDialogOpen} 
         onClose={() => setSecondDialogOpen(false)} 

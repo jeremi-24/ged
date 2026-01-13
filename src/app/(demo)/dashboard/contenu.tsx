@@ -23,7 +23,7 @@ export function Contenu({ onDataLoaded }: { onDataLoaded?: (docs: DocumentData[]
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // On ne déclenche le loading que si on n'a pas encore de données
+                
                 if (documents.length === 0) setLoading(true);
 
                 try {
@@ -32,7 +32,6 @@ export function Contenu({ onDataLoaded }: { onDataLoaded?: (docs: DocumentData[]
 
                     setDocuments(docs);
 
-                    // Cette ligne causait la boucle avant le useCallback
                     if (onDataLoaded) onDataLoaded(docs);
 
                     const archived = docs.filter(d => d.isArchived).length;
@@ -57,7 +56,7 @@ export function Contenu({ onDataLoaded }: { onDataLoaded?: (docs: DocumentData[]
             isMounted = false;
             unsubscribe();
         };
-    }, [onDataLoaded, documents.length]); // onDataLoaded est maintenant stable grâce au useCallback du parent
+    }, [onDataLoaded, documents.length]); 
 
     const metrics = [
         {

@@ -17,14 +17,11 @@ import { logEvent } from '@/lib/services/logEvent';
 import { getDeviceInfo } from '@/lib/utils/deviceInfo';
 import { collection, addDoc, setDoc, doc, getDocs } from 'firebase/firestore';
 
-
-// Schéma de validation avec Zod
 const formSchema = z.object({
   email: z.string().email("Email invalide").nonempty("L'email est requis"),
   password: z.string().min(6, "Le mot de passe doit comporter au moins 6 caractères"),
 });
 
-// Typage pour le formulaire
 type FormData = {
   email: string;
   password: string;
@@ -40,17 +37,15 @@ const RegisterPage: React.FC = () => {
   });
   const handleRegister = async (data: FormData) => {
     try {
-      // Inscription de l'utilisateur
+      
       await registerWithEmail(data.email, data.password);
-      
-      // Obtenir l'utilisateur actuellement authentifié
+
       const user = auth.currentUser; 
-      // Obtenir l'utilisateur actuellement authentifié
-      
+
       const isFirstUser = await checkIfFirstUser();
   
       if (user) {
-            // Création d'un document dans la collection users
+            
       const userDoc = {
         email: data.email,
         createdAt: new Date(),
@@ -58,53 +53,46 @@ const RegisterPage: React.FC = () => {
         role: isFirstUser ? 'admin' : 'user',
       };
 
-      // Ajoutez le document à la collection 'users'
       await setDoc(doc(firestore, "users", user.uid), userDoc);
 
-
-       
-  
-        // Enregistrement du log après l'inscription réussie
         const logEntry: LogEntry = {
-          event: "inscription utilisateur", // Événement "utilisateur inscrit"
-          userId: user.uid, // ID de l'utilisateur (UID)
-          createdAt: new Date(), // Date et heure de l'événement
+          event: "inscription utilisateur", 
+          userId: user.uid, 
+          createdAt: new Date(), 
           details: `Utilisateur inscrit avec l'email: ${data.email}`,
           documentId: '',
-          device: `Depuis ${deviceDetails}`, // Remplacez deviceDetails par la variable appropriée
+          device: `Depuis ${deviceDetails}`, 
         };
-        await logEvent(logEntry,user.uid); // Enregistre le log
+        await logEvent(logEntry,user.uid); 
   
-        setIsDialogOpen(true); // Ouvrir le dialog de confirmation
-        await signOut(auth); // Déconnexion de l'utilisateur
+        setIsDialogOpen(true); 
+        await signOut(auth); 
       }
     } catch (err) {
-      setError("L'inscription a échoué. Veuillez réessayer."); // Gestion des erreurs
+      setError("L'inscription a échoué. Veuillez réessayer."); 
     }
   };
   
   const checkIfFirstUser = async () => {
     const usersSnapshot = await getDocs(collection(firestore, "users"));
-    return usersSnapshot.empty; // Retourne true si c'est le premier utilisateur
+    return usersSnapshot.empty; 
   };
-  
 
   const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
-  
-      // Enregistrement du log après la connexion réussie via Google
+
       const user = auth.currentUser;
       if (user) {
         const logEntry: LogEntry = {
-          event: "Connexion google", // Événement "connexion avec Google"
-          userId: user.uid, // ID de l'utilisateur
-          createdAt: new Date(), // Date et heure de l'événement
+          event: "Connexion google", 
+          userId: user.uid, 
+          createdAt: new Date(), 
           details: `Utilisateur connecté avec Google: ${user.email} . ${deviceDetails}`,
           documentId: '',
           device:  `Depuis ${deviceDetails}  `,
         };
-        await logEvent(logEntry,user.uid); // Enregistre le log
+        await logEvent(logEntry,user.uid); 
       }
   
       router.push("/dashboard");
@@ -113,12 +101,11 @@ const RegisterPage: React.FC = () => {
     }
   };
   const deviceDetails = getDeviceInfo();
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-green-400 to-blue-500">
   <div className="flex w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden">
-    {/* Animation 3D à gauche */}
+    {}
     <div className="w-1/2 flex items-center justify-center bg-cover bg-center">
       <iframe
         src="https://lottie.host/embed/552efea2-8a40-4db0-a7d8-847b9ffb9e9c/e3kQNLewxP.json"
@@ -128,7 +115,7 @@ const RegisterPage: React.FC = () => {
       ></iframe>
     </div>
 
-    {/* Formulaire d'inscription à droite */}
+    {}
     <div className="w-1/2 p-8">
       <Card className="bg-transparent border-none shadow-none">
         <CardHeader>
@@ -205,7 +192,7 @@ const RegisterPage: React.FC = () => {
     </div>
   </div>
 
-  {/* Dialog de confirmation d'inscription */}
+  {}
   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
     <DialogContent className="sm:max-w-[425px] bg-white text-black">
       <DialogHeader>

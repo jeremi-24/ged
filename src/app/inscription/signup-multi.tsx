@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useForm, Controller } from "react-hook-form";
 
-
 import { ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { auth, firestore } from '@/firebase/config';
 import { collection, addDoc, setDoc, doc, getDocs } from 'firebase/firestore';
@@ -35,9 +34,8 @@ const COUNTRIES = [
   { code: "+241", name: "Gabon", flag: "🇬🇦" },
   { code: "+242", name: "Congo", flag: "🇨🇬" },
   { code: "+243", name: "RDC", flag: "🇨🇩" },
-  // Add more as needed
+  
 ];
-
 
 interface MultiStepFormProps {
   className?: string;
@@ -47,7 +45,6 @@ interface MultiStepFormProps {
   organisations_id: number | null;
 
 }
-
 
 export function MultiStepForm({
   className,
@@ -91,13 +88,10 @@ export function MultiStepForm({
       const responseData = await response.json();
 
       if (response.ok) {
-        const user = auth.currentUser; // Obtenez l'utilisateur actuellement authentifié
+        const user = auth.currentUser; 
 
         if (user) {
-          // Vérifier si l'utilisateur est le premier utilisateur
 
-
-          // Création du document utilisateur dans Firestore
           const userDoc = {
             email: email,
             createdAt: new Date(),
@@ -106,7 +100,6 @@ export function MultiStepForm({
             role: data.role,
           };
 
-          // Ajoutez le document à la collection 'users' dans Firestore
           await setDoc(doc(firestore, "users", user.uid), userDoc);
         }
         console.log("Utilisateur créé avec succès:", responseData.user);
@@ -121,8 +114,6 @@ export function MultiStepForm({
     }
   };
 
-
-
   const handleNextStep = () => {
     if (currentStep < 2) {
       setCurrentStep((prevStep) => prevStep + 1);
@@ -136,26 +127,26 @@ export function MultiStepForm({
   };
 
   const handleFileUpload = async (file: File) => {
-    const storageRef = ref(storage, `profile_pictures/${file.name}`); // Référence pour le fichier
-    const uploadTask = uploadBytesResumable(storageRef, file); // Crée une tâche d'upload
+    const storageRef = ref(storage, `profile_pictures/${file.name}`); 
+    const uploadTask = uploadBytesResumable(storageRef, file); 
 
     return new Promise<string>((resolve, reject) => {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          // Optionnel : Vous pouvez ajouter une gestion du progrès ici
+          
         },
         (error) => {
-          reject(error); // Si une erreur se produit, on la rejette
+          reject(error); 
         },
         () => {
-          // Lorsque l'upload est terminé, on récupère l'URL du fichier
+          
           getDownloadURL(uploadTask.snapshot.ref)
             .then((url) => {
-              resolve(url); // Retourne l'URL du fichier téléchargé
+              resolve(url); 
             })
             .catch((error) => {
-              reject(error); // En cas d'erreur pour récupérer l'URL
+              reject(error); 
             });
         }
       );
@@ -164,7 +155,7 @@ export function MultiStepForm({
 
   return (
     <div className={cn("grid gap-6 px-4 py-6", className)}>
-      {/* Indicateur d'étapes */}
+      {}
       <div className="flex mb-4 justify-center">
         <div className="flex items-center space-x-1 ml-1">
           <StepIndicator step={1} currentStep={currentStep} />
@@ -178,7 +169,7 @@ export function MultiStepForm({
         {currentStep === 2 && <Etape2 control={control} errors={errors} setValue={setValue} handleFileUpload={handleFileUpload} />}
 
         <div className="flex justify-between mt-4">
-          {/* Flèches sur mobile */}
+          {}
           {currentStep > 1 && (
             <button
               type="button"
@@ -189,7 +180,7 @@ export function MultiStepForm({
             </button>
           )}
 
-          {/* Boutons sur desktop */}
+          {}
           {currentStep > 1 && (
             <Button
               type="button"
@@ -200,7 +191,7 @@ export function MultiStepForm({
             </Button>
           )}
 
-          {/* Flèches sur mobile */}
+          {}
           <button
             type={currentStep === 2 ? "submit" : "button"}
             onClick={handleNextStep}
@@ -209,7 +200,7 @@ export function MultiStepForm({
             <ChevronRightIcon className="h-6 w-6 text-blue-600" />
           </button>
 
-          {/* Boutons sur desktop */}
+          {}
           <Button
             type="button"
             onClick={currentStep === 2 ? handleSubmit(onSubmit) : handleNextStep}

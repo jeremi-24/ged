@@ -1,6 +1,5 @@
 import { integer, text, boolean, pgTable, serial, date } from "drizzle-orm/pg-core";
 
-// Table des organisations
 export const organisations = pgTable("organisations", {
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
@@ -10,7 +9,6 @@ export const organisations = pgTable("organisations", {
     statut: boolean("statut").default(true),
 });
 
-// Table des utilisateurs
 export const users = pgTable("users", {
     id: serial("id").primaryKey(),
     firebase_uid: text("firebase_uid").notNull().unique(),
@@ -19,7 +17,7 @@ export const users = pgTable("users", {
     countryCode: text("countryCode").notNull(),
     last_name: text("last_name").notNull(),
     address: text("address").notNull(),
-    phone: text("phone").notNull(), // Correction : phone devrait être de type text
+    phone: text("phone").notNull(), 
     email: text("email").notNull().unique(),
     
     role: text("role").notNull(),
@@ -31,11 +29,10 @@ export const users = pgTable("users", {
     photo_url: text("photo_url"),
 });
 
-// Table des documents
 export const documents = pgTable("documents", {
     id: serial("id").primaryKey(),
     organisations_id: integer("organisations_id").references(() => organisations.id).notNull(),
-    users_id: integer("users_id").references(() => users.id).notNull(), // Correction : users_id devrait être de type text
+    users_id: integer("users_id").references(() => users.id).notNull(), 
     name: text("name").notNull(),
     type: text("type").notNull(),
     size: integer("size").notNull(),
@@ -49,7 +46,7 @@ export const documents = pgTable("documents", {
 export const folder = pgTable("folder", {
     id: serial("id").primaryKey(),
     organisations_id: integer("organisations_id").references(() => organisations.id).notNull(),
-    users_id: integer("users_id").references(() => users.id).notNull(), // Correction : users_id devrait être de type text
+    users_id: integer("users_id").references(() => users.id).notNull(), 
     name: text("name").notNull(),
     documents_id: integer("documents_id").references(() => documents.id).notNull(),
     size: integer("size").notNull(),
@@ -59,7 +56,6 @@ export const folder = pgTable("folder", {
     update_at: date("update_at").defaultNow(),
 });
 
-// Table des métadonnées de documents
 export const document_metadata = pgTable("document_metadata", {
     id: serial("id").primaryKey().notNull(),
     documents_id: integer("documents_id").references(() => documents.id).notNull(),
@@ -67,30 +63,26 @@ export const document_metadata = pgTable("document_metadata", {
     update_at: date("update_at").defaultNow(),
 });
 
-// Table des rôles
 export const roles = pgTable("roles", {
     id: serial("id").primaryKey().notNull(),
     name: text("name").unique().notNull(),
     description: text("description").notNull(),
 });
 
-// Table des rôles des utilisateurs
 export const user_roles = pgTable("user_roles", {
     id: serial("id").primaryKey().notNull(),
     users_id: integer("users_id").references(() => users.id).notNull(),
     roles_id: integer("roles_id").references(() => roles.id).notNull(),
 });
 
-// Table des logs
 export const logs = pgTable("logs", {
     id: serial("id").primaryKey().notNull(),
-    users_id: integer("users_id").references(() => users.id).notNull(), // Correction : users_id devrait être de type text
+    users_id: integer("users_id").references(() => users.id).notNull(), 
     action: text("action").notNull(),
     description: text("description").notNull(),
     created_at: date("created_at").defaultNow(),
 });
 
-// Table des versions de documents
 export const document_versions = pgTable("document_versions", {
     id: serial("id").primaryKey().notNull(),
     documents_id: integer("documents_id").references(() => documents.id).notNull(),
@@ -100,19 +92,17 @@ export const document_versions = pgTable("document_versions", {
     upload_at: date("upload_at").defaultNow(),
 });
 
-// Table des documents partagés
 export const document_shared = pgTable("document_shared", {
     id: serial("id").primaryKey().notNull(),
     documents_id: integer("documents_id").references(() => documents.id).notNull(),
-    shared_with_user_id: integer("shared_with_user_id").references(() => users.id).notNull(), // Correction : shared_with_user_id devrait être de type text
+    shared_with_user_id: integer("shared_with_user_id").references(() => users.id).notNull(), 
     permission: text("permission").notNull().default('view'),
     created_at: date("created_at").defaultNow(),
 });
 
-// Table des notifications
 export const notification = pgTable("notification", {
     id: serial("id").primaryKey().notNull(),
-    users_id: integer("users_id").references(() => users.id).notNull(), // Correction : users_id devrait être de type text
+    users_id: integer("users_id").references(() => users.id).notNull(), 
     message: text("message").notNull(),
     created_at: date("created_at").defaultNow(),
 });

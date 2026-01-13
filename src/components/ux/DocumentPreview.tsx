@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { pdfjs } from "react-pdf";
 
-// Assurez-vous de définir la workerSrc pour PDF.js
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 interface DocumentPreviewProps {
@@ -16,7 +15,6 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({ documentUrl }) => {
       const loadingTask = pdfjs.getDocument(documentUrl);
       const pdf = await loadingTask.promise;
 
-      // Rendre la première page du PDF
       const page = await pdf.getPage(1);
       const viewport = page.getViewport({ scale: 1 });
 

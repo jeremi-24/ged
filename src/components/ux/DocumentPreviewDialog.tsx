@@ -1,10 +1,10 @@
-// components/DocumentPreviewDialog.tsx
+
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import Image from "next/image";
 
 interface DocumentPreviewDialogProps {
-  previewUrl: string;  // URL de l'image pour l'aperçu
+  previewUrl: string;  
   metadata: {
     name: string;
     type: string;
@@ -13,8 +13,8 @@ interface DocumentPreviewDialogProps {
     createdAt: Date;
     url: string;
   };
-  open: boolean; // Indicateur d'ouverture du dialog
-  onClose: () => void; // Fonction de fermeture du dialog
+  open: boolean; 
+  onClose: () => void; 
 }
 
 const DocumentPreviewDialog: React.FC<DocumentPreviewDialogProps> = ({ previewUrl, metadata, open, onClose }) => {

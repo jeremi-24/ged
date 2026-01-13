@@ -30,43 +30,38 @@ export function Menu({ isOpen }: MenuProps) {
   const menuList = getMenuList(pathname);
   const { t } = useLanguage();
 
-
   const handleLogout = async () => {
     try {
-      // Récupérer l'ID de l'utilisateur actuellement connecté avant la déconnexion
+      
       const user = auth.currentUser;
-      const userId = user ? user.uid : "utilisateur_inconnu"; // Gestion si l'utilisateur n'est pas trouvé
+      const userId = user ? user.uid : "utilisateur_inconnu"; 
 
-      // Enregistrement du log avant la déconnexion
       const logEntry: LogEntry = {
-        event: "deconnexion_utilisateur", // Événement pour déconnexion
-        userId: userId, // ID de l'utilisateur
-        createdAt: new Date(), // Date et heure de l'événement
+        event: "deconnexion_utilisateur", 
+        userId: userId, 
+        createdAt: new Date(), 
         details: `L'utilisateur ${user ? user.email : "inconnu"} s'est déconnecté.`,
         documentId: "",
         device: `Depuis ${deviceDetails}  `,
       };
-      await logEvent(logEntry, userId); // Enregistrement du log
+      await logEvent(logEntry, userId); 
 
-      // Procéder à la déconnexion
       await logout();
 
-      // Rediriger l'utilisateur vers la page de connexion après déconnexion
       window.location.href = "/connexion";
     } catch (error: any) {
       console.error("Erreur lors de la déconnexion :", error);
       alert(error.message);
 
-      // Enregistrement du log en cas d'erreur lors de la déconnexion
       const errorLog: LogEntry = {
-        event: "deconnexion_echec", // Événement pour échec de déconnexion
-        userId: auth.currentUser ? auth.currentUser.uid : "utilisateur_inconnu", // ID de l'utilisateur si disponible
-        createdAt: new Date(), // Date et heure de l'événement
+        event: "deconnexion_echec", 
+        userId: auth.currentUser ? auth.currentUser.uid : "utilisateur_inconnu", 
+        createdAt: new Date(), 
         details: `Échec de la déconnexion pour l'utilisateur : ${error.message}`,
         documentId: "",
         device: `Depuis ${deviceDetails}  `,
       };
-      await logEvent(errorLog, ""); // Enregistrement du log pour l'erreur de déconnexion
+      await logEvent(errorLog, ""); 
     }
   };
   const deviceDetails = getDeviceInfo();

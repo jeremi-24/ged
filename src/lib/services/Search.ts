@@ -10,7 +10,6 @@ export const useSearch = () => {
   const [results, setResults] = useState<DocumentData[]>([]);
   const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
 
-  // Fonction pour récupérer tous les documents avec cache
   const fetchAllDocuments = async () => {
     try {
       const auth = getAuth();
@@ -18,22 +17,21 @@ export const useSearch = () => {
 
       if (!user) {
         console.error("Aucun utilisateur connecté.");
-        return; // Sortir de la fonction si l'utilisateur n'est pas connecté
+        return; 
       }
 
-      // Vérifier si les documents sont dans le cache local
       const cachedDocuments = localStorage.getItem(`documents_${user.uid}`);
       if (cachedDocuments) {
         console.log("Documents récupérés depuis le cache local.");
-        setAllDocuments(JSON.parse(cachedDocuments)); // Utiliser le cache
+        setAllDocuments(JSON.parse(cachedDocuments)); 
         return;
       }
 
-      const documentsRef = collection(firestore, 'users', user.uid, 'documents'); // Accéder à la sous-collection "documents"
+      const documentsRef = collection(firestore, 'users', user.uid, 'documents'); 
       const querySnapshot = await getDocs(documentsRef);
 
       const documents: DocumentData[] = querySnapshot.docs.map(doc => {
-        const data = doc.data() as DocumentData; // Type des données
+        const data = doc.data() as DocumentData; 
         return {
           id: doc.id,
           name: data.name,
@@ -47,38 +45,33 @@ export const useSearch = () => {
         };
       });
 
-      setAllDocuments(documents); // Stocke tous les documents dans l'état
-      localStorage.setItem(`documents_${user.uid}`, JSON.stringify(documents)); // Mettre en cache dans le localStorage
+      setAllDocuments(documents); 
+      localStorage.setItem(`documents_${user.uid}`, JSON.stringify(documents)); 
       console.log("Tous les documents récupérés et mis en cache :", documents);
     } catch (error) {
       console.error("Erreur lors de la récupération des documents :", error);
     }
   };
 
-  // Utilise useEffect pour récupérer les documents une seule fois lors du premier chargement
   useEffect(() => {
     fetchAllDocuments();
   }, []);
 
-  // Fonction pour rechercher des documents
   const filterDocuments = useCallback((text: string) => {
     return allDocuments.filter(doc => doc.text.includes(text));
-  }, [allDocuments]); // Dépend de allDocuments
+  }, [allDocuments]); 
 
-  // Utilise useEffect pour filtrer les résultats chaque fois que le texte de recherche change
   useEffect(() => {
     if (!searchText) {
-      setResults(allDocuments); // Si aucune recherche, montrez tous les documents
+      setResults(allDocuments); 
     } else {
       const filteredResults = filterDocuments(searchText);
       setResults(filteredResults);
 
-      // Enregistrer la recherche dans Firestore
       enregistrerHistoriqueRecherche(searchText);
     }
   }, [searchText, allDocuments, filterDocuments]);
 
-  // Fonction pour enregistrer l'historique des recherches dans Firestore
   const enregistrerHistoriqueRecherche = async (searchText: string) => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -101,7 +94,6 @@ export const useSearch = () => {
     }
   };
 
-  // Fonction pour démarrer la reconnaissance vocale
   const startVoiceSearch = (callback: (text: string) => void) => {
     if (!('webkitSpeechRecognition' in window)) {
       alert("Votre navigateur ne prend pas en charge la recherche vocale.");
@@ -112,15 +104,14 @@ export const useSearch = () => {
     const recognitionInstance = new SpeechRecognition();
 
     recognitionInstance.interimResults = false;
-    recognitionInstance.lang = 'fr-FR'; // Définir la langue à français
+    recognitionInstance.lang = 'fr-FR'; 
 
     recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
       let transcript = event.results[0][0].transcript;
 
-      // Enlever le point si le texte se termine par un point
-      transcript = transcript.replace(/\.+$/, ''); // Remplace les points finaux par une chaîne vide
-      setSearchText(transcript); // Met à jour le texte de recherche sans le point final
-      callback(transcript); // Appelle le callback avec le texte transcrit
+      transcript = transcript.replace(/\.+$/, ''); 
+      setSearchText(transcript); 
+      callback(transcript); 
     };
 
     recognitionInstance.onerror = (event: SpeechRecognitionError) => {
@@ -134,7 +125,7 @@ export const useSearch = () => {
   return {
     searchText,
     setSearchText,
-    results, // Résultats filtrés
+    results, 
     startVoiceSearch,
   };
 };

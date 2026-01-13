@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/select";
 import { Languages } from 'lucide-react';
 
-
 interface User {
   photoURL?: string;
   prenom?: string;

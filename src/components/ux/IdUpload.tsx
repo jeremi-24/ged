@@ -3,14 +3,14 @@ import { useDropzone } from "react-dropzone";
 import { Upload } from "lucide-react";
 
 type IdUploadProps = {
-  onDrop: (file: File) => void; // On accepte un seul fichier
+  onDrop: (file: File) => void; 
 };
 
 const IdUpload = ({ onDrop }: IdUploadProps) => {
   const onDropCallback = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
-        onDrop(acceptedFiles[0]); // On envoie uniquement le premier fichier sélectionné
+        onDrop(acceptedFiles[0]); 
       }
     },
     [onDrop]
@@ -19,9 +19,9 @@ const IdUpload = ({ onDrop }: IdUploadProps) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: onDropCallback,
     accept: {
-      "image/*": [] // Limité aux fichiers d'image uniquement
+      "image/*": [] 
     },
-    maxFiles: 1 // Limiter à un seul fichier
+    maxFiles: 1 
   });
 
   return (

@@ -18,7 +18,6 @@ import Contenu from './contenu';
 import Contenu2 from '../users/contenu';
 import ReactLoading from 'react-loading';
 
-
 export default function UsersPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);

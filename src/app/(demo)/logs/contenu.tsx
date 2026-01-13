@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { fetchLogs } from '@/lib/services/logsServices';
 import { LogEntry } from '@/types/Logs';
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, XCircle, User, FileText, Info, Monitor } from 'lucide-react'; // Ajout des icônes supplémentaires
+import { CheckCircle, XCircle, User, FileText, Info, Monitor } from 'lucide-react'; 
 import { auth } from '@/firebase/config';
 import UserInfoDialog from '@/components/ux/UserInfoDialog';
 

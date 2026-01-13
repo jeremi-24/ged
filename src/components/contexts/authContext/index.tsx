@@ -16,7 +16,7 @@ import {
 interface AuthContextType {
   user: User | null;
   userId: string | null;
-  loading: boolean; // Ajout de loading ici
+  loading: boolean; 
   loginWithEmail: (email: string, password: string) => Promise<void>;
   registerWithEmail: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
@@ -80,7 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value: AuthContextType = {
     user,
     userId,
-    loading, // Ajoute ici
+    loading, 
     loginWithEmail,
     registerWithEmail,
     loginWithGoogle,

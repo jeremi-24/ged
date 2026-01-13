@@ -31,8 +31,6 @@
       opacity: 1;
     }
   }
-  
-  /* rotation */
 
 @keyframes rotate {
     0% {
@@ -44,11 +42,8 @@
   }
   
   .rotate {
-    animation: rotate 1.5s linear infinite; /* Vous pouvez ajuster la durée selon vos préférences */
+    animation: rotate 1.5s linear infinite; 
   }
-  
-
-
 
 .glow-on-hover {
     width: 200px;

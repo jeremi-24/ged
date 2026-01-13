@@ -6,8 +6,8 @@ import { Progress } from "@/components/ui/progress";
 import { HardDrive } from "lucide-react";
 
 interface StorageCardProps {
-    used: number; // in bytes
-    total: number; // in bytes
+    used: number; 
+    total: number; 
 }
 
 export function StorageCard({ used, total }: StorageCardProps) {

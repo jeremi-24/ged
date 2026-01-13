@@ -1,8 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 type ClassifyDocumentOptions = {
-  apiKey: string; // Clé API de Google Generative AI
-  model: string; // Nom du modèle Google Generative AI, par exemple "gemini-1.5-flash"
+  apiKey: string; 
+  model: string; 
 };
 
 const Chat = async (text: string, options: ClassifyDocumentOptions): Promise<string> => {
@@ -14,11 +14,11 @@ const Chat = async (text: string, options: ClassifyDocumentOptions): Promise<str
   const model = genAI.getGenerativeModel({ model: options.model });
 
   const generationConfig = {
-    temperature: 0.15, // Réduire la température pour des réponses plus directes
+    temperature: 0.15, 
     topP: 0.95,
     topK: 64,
 
-    maxOutputTokens: 1000000, // Limitez le nombre de tokens pour obtenir une réponse concise
+    maxOutputTokens: 1000000, 
     responseMimeType: "text/plain",
   };
 
@@ -29,9 +29,8 @@ const Chat = async (text: string, options: ClassifyDocumentOptions): Promise<str
   });
 
   try {
-    // Modifier l'instruction pour demander une réponse concise
+    
     const instruction = `${text}`;
-
 
     const result = await chatSession.sendMessage(instruction);
     return result.response.text().trim();
