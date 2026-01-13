@@ -16,6 +16,8 @@ import { auth } from '@/firebase/config';
 import { LogEntry } from '@/types/Logs';
 import { logEvent } from '@/lib/services/logEvent';
 import { getDeviceInfo } from '@/lib/utils/deviceInfo';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const formSchema = z.object({
     email: z.string().email({ message: 'Entrez une adresse email valide' }),
@@ -28,6 +30,7 @@ export default function UserAuthForm() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showVerificationAlert, setShowVerificationAlert] = useState(false);
 
     const form = useForm<UserFormValue>({
         resolver: zodResolver(formSchema),
@@ -40,6 +43,7 @@ export default function UserAuthForm() {
     const onSubmit = async (data: UserFormValue) => {
         setLoading(true);
         setError(null);
+        setShowVerificationAlert(false);
         const deviceDetails = getDeviceInfo();
 
         try {
@@ -70,7 +74,7 @@ export default function UserAuthForm() {
                 await logEvent(successLog, loggedUser.uid);
                 router.push("/dashboard");
             } else {
-                setError("Veuillez vérifier votre email avant d&apos;accéder au tableau de bord.");
+                setShowVerificationAlert(true);
                 await signOut(auth);
 
                 // Log unverified
@@ -83,11 +87,6 @@ export default function UserAuthForm() {
                     device: `Depuis ${deviceDetails}`,
                 };
                 await logEvent(unverifiedLog, loggedUser.uid);
-                toast({
-                    title: "Attention",
-                    description: "Veuillez vérifier votre email avant de vous connecter.",
-                    variant: "destructive",
-                });
             }
         } catch (err: any) {
             setError("Échec de la connexion. Veuillez vérifier vos identifiants.");
@@ -168,6 +167,16 @@ export default function UserAuthForm() {
                     Entrez votre email pour vous connecter à votre compte
                 </p>
             </div>
+
+            {showVerificationAlert && (
+                <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive dark:text-red-400">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Email non vérifié</AlertTitle>
+                    <AlertDescription>
+                        Votre adresse email n'a pas encore été vérifiée. Veuillez consulter votre boîte de réception pour le lien de confirmation que nous vous avons envoyé.
+                    </AlertDescription>
+                </Alert>
+            )}
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
                     <FormField

@@ -13,6 +13,30 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const COUNTRIES = [
+  { code: "+33", name: "France", flag: "🇫🇷" },
+  { code: "+1", name: "USA", flag: "🇺🇸" },
+  { code: "+228", name: "Togo", flag: "🇹🇬" },
+  { code: "+229", name: "Bénin", flag: "🇧🇯" },
+  { code: "+221", name: "Sénégal", flag: "🇸🇳" },
+  { code: "+225", name: "Côte d'Ivoire", flag: "🇨🇮" },
+  { code: "+212", name: "Maroc", flag: "🇲🇦" },
+  { code: "+213", name: "Algérie", flag: "🇩🇿" },
+  { code: "+216", name: "Tunisie", flag: "🇹🇳" },
+  { code: "+237", name: "Cameroun", flag: "🇨🇲" },
+  { code: "+241", name: "Gabon", flag: "🇬🇦" },
+  { code: "+242", name: "Congo", flag: "🇨🇬" },
+  { code: "+243", name: "RDC", flag: "🇨🇩" },
+  // Add more as needed
+];
 
 
 interface MultiStepFormProps {
@@ -21,7 +45,7 @@ interface MultiStepFormProps {
   email: string;
   country: string;
   organisations_id: number | null;
- 
+
 }
 
 
@@ -34,9 +58,9 @@ export function MultiStepForm({
 }: MultiStepFormProps) {
   const [currentStep, setCurrentStep] = React.useState(1);
   const { control, handleSubmit, formState: { errors }, setValue, getValues } = useForm(
-    
+
   );
-  
+
   const [isLoading, setIsLoading] = React.useState(false);
   const router = useRouter();
   const onSubmit = async (data: any) => {
@@ -55,7 +79,7 @@ export function MultiStepForm({
         location: country || '',
         photo_url: data.photo_url || '',
       };
-  
+
       const response = await fetch("/api/users/createUser/", {
         method: "POST",
         headers: {
@@ -63,25 +87,25 @@ export function MultiStepForm({
         },
         body: JSON.stringify(userData),
       });
-  
+
       const responseData = await response.json();
-  
+
       if (response.ok) {
         const user = auth.currentUser; // Obtenez l'utilisateur actuellement authentifié
 
         if (user) {
           // Vérifier si l'utilisateur est le premier utilisateur
-          
-  
+
+
           // Création du document utilisateur dans Firestore
           const userDoc = {
             email: email,
             createdAt: new Date(),
             nom: data.first_name || '',
             prenom: data.last_name || '',
-            role:data.role ,
+            role: data.role,
           };
-  
+
           // Ajoutez le document à la collection 'users' dans Firestore
           await setDoc(doc(firestore, "users", user.uid), userDoc);
         }
@@ -96,8 +120,8 @@ export function MultiStepForm({
       setIsLoading(false);
     }
   };
-  
-  
+
+
 
   const handleNextStep = () => {
     if (currentStep < 2) {
@@ -151,7 +175,7 @@ export function MultiStepForm({
 
       <form onSubmit={handleSubmit(onSubmit)}>
         {currentStep === 1 && <Etape1 control={control} errors={errors} />}
-        {currentStep === 2 && <Etape2 control={control} errors={errors}  setValue={setValue} handleFileUpload={handleFileUpload} />}
+        {currentStep === 2 && <Etape2 control={control} errors={errors} setValue={setValue} handleFileUpload={handleFileUpload} />}
 
         <div className="flex justify-between mt-4">
           {/* Flèches sur mobile */}
@@ -187,23 +211,23 @@ export function MultiStepForm({
 
           {/* Boutons sur desktop */}
           <Button
-  type="button"
-  onClick={currentStep === 2 ? handleSubmit(onSubmit) : handleNextStep}
-  disabled={isLoading}
-  className={`hidden sm:flex w-full sm:w-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
->
-  {isLoading ? (
-    <div className="flex items-center">
-      <Icons.spinner className="animate-spin mr-2 h-4 w-4" />
-      Chargement...
-    </div>
-  ) : (
-    <>
-      {currentStep === 2 ? "Soumettre" : "Suivant"}
-      <ArrowRightIcon className="ml-2 h-4 w-4" />
-    </>
-  )}
-</Button>
+            type="button"
+            onClick={currentStep === 2 ? handleSubmit(onSubmit) : handleNextStep}
+            disabled={isLoading}
+            className={`hidden sm:flex w-full sm:w-auto ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {isLoading ? (
+              <div className="flex items-center">
+                <Icons.spinner className="animate-spin mr-2 h-4 w-4" />
+                Chargement...
+              </div>
+            ) : (
+              <>
+                {currentStep === 2 ? "Soumettre" : "Suivant"}
+                <ArrowRightIcon className="ml-2 h-4 w-4" />
+              </>
+            )}
+          </Button>
 
         </div>
       </form>
@@ -238,10 +262,10 @@ interface Etape1Props {
 
 export function Etape1({ control, errors }: Etape1Props) {
   return (
-    <div>
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="first_name" className="text-black">Prénom</Label>
+    <div className="space-y-6">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="first_name">Prénom</Label>
           <Controller
             name="first_name"
             control={control}
@@ -252,16 +276,15 @@ export function Etape1({ control, errors }: Etape1Props) {
                 id="first_name"
                 placeholder="Votre prénom"
                 type="text"
-                className="text-black"
                 value={field.value || ''}
               />
             )}
           />
-          {errors.first_name && <span className="text-red-500">{errors.first_name.message}</span>}
+          {errors.first_name && <span className="text-red-500 text-xs">{errors.first_name.message}</span>}
         </div>
 
-        <div>
-          <Label htmlFor="last_name" className="text-black">Nom</Label>
+        <div className="space-y-2">
+          <Label htmlFor="last_name">Nom</Label>
           <Controller
             name="last_name"
             control={control}
@@ -272,56 +295,66 @@ export function Etape1({ control, errors }: Etape1Props) {
                 id="last_name"
                 placeholder="Votre nom"
                 type="text"
-                className="text-black"
                 value={field.value || ''}
               />
             )}
           />
-          {errors.last_name && <span className="text-red-500">{errors.last_name.message}</span>}
+          {errors.last_name && <span className="text-red-500 text-xs">{errors.last_name.message}</span>}
         </div>
+      </div>
 
-        <div>
-          <Label htmlFor="address" className="text-black">Adresse</Label>
-          <Controller
-            name="address"
-            control={control}
-            rules={{ required: "L'adresse est requise" }}
-            render={({ field }) => (
-              <Input
-                {...field}
-                id="address"
-                placeholder="Votre adresse"
-                type="text"
-                className="text-black"
-                value={field.value || ''}
-              />
-            )}
-          />
-          {errors.address && <span className="text-red-500">{errors.address.message}</span>}
-        </div>
-
-        <div>
-          <Label htmlFor="phone" className="text-black">Téléphone</Label>
-          <div className="flex">
-            <Controller
-              name="countryCode"
-              control={control}
-              render={({ field }) => (
-                <select {...field} id="countryCode" className="input w-[100px] mr-2">
-                  <option value="+1">+1</option>
-                  <option value="+33">+33</option>
-                  <option value="+44">+44</option>
-                  {/* Ajoute ici d'autres indicatifs de pays */}
-                </select>
-              )}
+      <div className="space-y-2">
+        <Label htmlFor="address">Adresse</Label>
+        <Controller
+          name="address"
+          control={control}
+          rules={{ required: "L'adresse est requise" }}
+          render={({ field }) => (
+            <Input
+              {...field}
+              id="address"
+              placeholder="Votre adresse"
+              type="text"
+              value={field.value || ''}
             />
+          )}
+        />
+        {errors.address && <span className="text-red-500 text-xs">{errors.address.message}</span>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="phone">Téléphone</Label>
+        <div className="flex gap-2">
+          <Controller
+            name="countryCode"
+            control={control}
+            defaultValue="+228"
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue placeholder="Pays" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTRIES.map((c) => (
+                    <SelectItem key={c.code} value={c.code}>
+                      <span className="flex items-center gap-2">
+                        <span>{c.flag}</span>
+                        <span>{c.code}</span>
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          <div className="flex-1">
             <Controller
               name="phone"
               control={control}
               rules={{
                 required: "Le numéro de téléphone est requis",
                 pattern: {
-                  value: /^\+?[1-9]\d{1,14}$/,
+                  value: /^[0-9]+$/,
                   message: "Numéro de téléphone invalide",
                 },
               }}
@@ -329,16 +362,15 @@ export function Etape1({ control, errors }: Etape1Props) {
                 <Input
                   {...field}
                   id="phone"
-                  placeholder="Votre numéro de téléphone"
+                  placeholder="Ex: 90000000"
                   type="tel"
-                  className="text-black"
                   value={field.value || ''}
                 />
               )}
             />
           </div>
-          {errors.phone && <span className="text-red-500">{errors.phone.message}</span>}
         </div>
+        {errors.phone && <span className="text-red-500 text-xs">{errors.phone.message}</span>}
       </div>
     </div>
   );
@@ -351,54 +383,60 @@ interface Etape2Props {
   setValue: (name: string, value: any) => void;
 }
 
-export function Etape2({ control, errors , handleFileUpload, setValue}: Etape2Props) {
+export function Etape2({ control, errors, handleFileUpload, setValue }: Etape2Props) {
   return (
-    <div>
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-      
-
-        <div>
-          <Label htmlFor="role" className="text-black">Rôle</Label>
+    <div className="space-y-6">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="role">Rôle</Label>
           <Controller
             name="role"
             control={control}
+            defaultValue="none"
             render={({ field }) => (
-              <select {...field} id="role" className="input">
-                <option value="none">Choisissez votre role</option>
-                <option value="admin">Administrateur</option>
-                <option value="user">Utilisateur</option>
-                {/* Ajoute d'autres rôles si nécessaire */}
-              </select>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisissez votre rôle" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Choisissez votre rôle</SelectItem>
+                  <SelectItem value="admin">Administrateur</SelectItem>
+                  <SelectItem value="user">Utilisateur</SelectItem>
+                </SelectContent>
+              </Select>
             )}
           />
-          {errors.role && <span className="text-red-500">{errors.role.message}</span>}
+          {errors.role && <span className="text-red-500 text-xs">{errors.role.message}</span>}
         </div>
 
-        <div>
-          <Label htmlFor="profilePicture" className="text-black">Photo de profil</Label>
-          <Controller
-            name="profilePicture"
-            control={control}
-            render={({ field }) => (
-              <input
-                {...field}
-                id="profilePicture"
-                type="file"
-                className="input w-full"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    try {
-                      const photoUrl = await handleFileUpload(file); // Upload de la photo
-                      setValue("photo_url", photoUrl); // Met à jour l'URL dans les valeurs du formulaire
-                    } catch (error) {
-                      console.error("Erreur lors du téléchargement de la photo", error);
+        <div className="space-y-2">
+          <Label htmlFor="profilePicture">Photo de profil</Label>
+          <div className="grid w-full items-center gap-1.5">
+            <Controller
+              name="profilePicture"
+              control={control}
+              render={({ field: { value, onChange, ...field } }) => (
+                <Input
+                  {...field}
+                  id="profilePicture"
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      try {
+                        const photoUrl = await handleFileUpload(file);
+                        setValue("photo_url", photoUrl);
+                        onChange(e.target.value);
+                      } catch (error) {
+                        console.error("Erreur lors du téléchargement de la photo", error);
+                      }
                     }
-                  }
-                }}
-              />
-            )}
-          />
+                  }}
+                />
+              )}
+            />
+          </div>
         </div>
       </div>
     </div>
