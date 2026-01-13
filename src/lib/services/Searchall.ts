@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { firestore } from '@/firebase/config';
 import { collection, getDocs, query, where, documentId, addDoc } from 'firebase/firestore';
 import { DocumentData } from '@/types/types';
@@ -12,15 +12,15 @@ export const useSearch = () => {
 
   const fetchAllDocuments = async () => {
     try {
-      const usersCollectionRef = collection(firestore, 'users'); 
+      const usersCollectionRef = collection(firestore, 'users');
       const userSnapshot = await getDocs(usersCollectionRef);
 
       const allDocs: DocumentData[] = [];
 
       for (const userDoc of userSnapshot.docs) {
-        const documentsRef = collection(userDoc.ref, 'documents'); 
+        const documentsRef = collection(userDoc.ref, 'documents');
         const docSnapshot = await getDocs(documentsRef);
-        
+
         const userDocuments = docSnapshot.docs.map(doc => {
           const data = doc.data() as DocumentData;
           return {
@@ -33,24 +33,24 @@ export const useSearch = () => {
             type: data.type,
             url: data.url,
             userId: userDoc.id,
-            isArchived : data.isArchived 
+            isArchived: data.isArchived
           };
         });
-        
-        allDocs.push(...userDocuments); 
+
+        allDocs.push(...userDocuments);
       }
 
-      setAllDocuments(allDocs); 
+      setAllDocuments(allDocs);
       console.log("Tous les documents récupérés :", allDocs);
     } catch (error) {
       console.error("Erreur lors de la récupération des documents :", error);
     }
   };
 
-    const filterDocuments = (text: string): DocumentData[] => {
-      const regex = new RegExp(text, 'i'); 
-      return allDocuments.filter(doc => doc.text && regex.test(doc.text));
-    };
+  const filterDocuments = useCallback((text: string): DocumentData[] => {
+    const regex = new RegExp(text, 'i');
+    return allDocuments.filter(doc => doc.text && regex.test(doc.text));
+  }, [allDocuments]);
 
   useEffect(() => {
     fetchAllDocuments();
@@ -58,13 +58,13 @@ export const useSearch = () => {
 
   useEffect(() => {
     if (!searchText) {
-      setResults(allDocuments); 
+      setResults(allDocuments);
     } else {
       const filteredResults = filterDocuments(searchText);
       setResults(filteredResults);
     }
-  
-  }, [searchText, allDocuments]);
+
+  }, [searchText, allDocuments, filterDocuments]);
 
   const enregistrerHistoriqueRecherche = async (searchText: string) => {
     const auth = getAuth();
@@ -87,7 +87,7 @@ export const useSearch = () => {
       console.error("Erreur lors de l'enregistrement de la recherche :", error);
     }
   };
-  
+
   const startVoiceSearch = (callback: (text: string) => void) => {
     if (!('webkitSpeechRecognition' in window)) {
       alert("Votre navigateur ne prend pas en charge la recherche vocale.");
@@ -98,12 +98,12 @@ export const useSearch = () => {
     const recognitionInstance = new SpeechRecognition();
 
     recognitionInstance.interimResults = false;
-    recognitionInstance.lang = 'fr-FR'; 
+    recognitionInstance.lang = 'fr-FR';
 
     recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
       const transcript = event.results[0][0].transcript;
-      setSearchText(transcript); 
-      callback(transcript); 
+      setSearchText(transcript);
+      callback(transcript);
     };
 
     recognitionInstance.onerror = (event: SpeechRecognitionError) => {
@@ -117,7 +117,7 @@ export const useSearch = () => {
   return {
     searchText,
     setSearchText,
-    results, 
+    results,
     startVoiceSearch,
   };
 };

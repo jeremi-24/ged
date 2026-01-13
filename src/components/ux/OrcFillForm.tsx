@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Tesseract from 'tesseract.js';
 
 const extractInformation = (text: string) => {
@@ -11,8 +11,8 @@ const extractInformation = (text: string) => {
 };
 
 type OrcFillFormProps = {
-  imageUrl: string; 
-  onUserFormDataChange: (data: { numero: string }) => void; 
+  imageUrl: string;
+  onUserFormDataChange: (data: { numero: string }) => void;
 };
 
 const OrcFillForm = ({ imageUrl, onUserFormDataChange }: OrcFillFormProps) => {
@@ -21,7 +21,7 @@ const OrcFillForm = ({ imageUrl, onUserFormDataChange }: OrcFillFormProps) => {
   });
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  const processOCR = (url: string) => {
+  const processOCR = useCallback((url: string) => {
     setIsProcessing(true);
     Tesseract.recognize(url, 'fra')
       .then(({ data: { text } }) => {
@@ -33,14 +33,14 @@ const OrcFillForm = ({ imageUrl, onUserFormDataChange }: OrcFillFormProps) => {
       .catch(() => {
         setIsProcessing(false);
       });
-  };
+  }, [onUserFormDataChange]);
 
   useEffect(() => {
     if (imageUrl) {
       processOCR(imageUrl);
     }
-  
-  }, [imageUrl]);
+
+  }, [imageUrl, processOCR]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -49,12 +49,12 @@ const OrcFillForm = ({ imageUrl, onUserFormDataChange }: OrcFillFormProps) => {
       [name]: value
     };
     setUserFormData(updatedData);
-    onUserFormDataChange(updatedData); 
+    onUserFormDataChange(updatedData);
   };
 
   return (
     <div className="p-4 rounded-lg">
-      {}
+      { }
       {isProcessing ? (
         <div className="flex justify-center items-center">
           <div className="spinner-border animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>

@@ -61,7 +61,7 @@ export default function UserAuthForm() {
             await logEvent(logEntry, loggedUser.uid);
 
             if (loggedUser.emailVerified) {
-                
+
                 const successLog: LogEntry = {
                     event: "Connexion de l'utilisateur",
                     userId: loggedUser.uid,
@@ -167,7 +167,7 @@ export default function UserAuthForm() {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Email non vérifié</AlertTitle>
                     <AlertDescription>
-                        Votre adresse email n'a pas encore été vérifiée. Veuillez consulter votre boîte de réception pour le lien de confirmation que nous vous avons envoyé.
+                        Votre adresse email n&apos;a pas encore été vérifiée. Veuillez consulter votre boîte de réception pour le lien de confirmation que nous vous avons envoyé.
                     </AlertDescription>
                 </Alert>
             )}
